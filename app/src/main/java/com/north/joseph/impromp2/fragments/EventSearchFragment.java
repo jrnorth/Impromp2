@@ -7,7 +7,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
 
-import com.north.joseph.impromp2.fragments.dummy.DummyContent;
 import com.north.joseph.impromp2.items.Event;
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -112,12 +111,6 @@ public class EventSearchFragment extends ListFragment {
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
-
-        if (null != mListener) {
-            // Notify the active callbacks interface (the activity, if the
-            // fragment is attached to one) that an item has been selected.
-            mListener.onFragmentInteraction(DummyContent.ITEMS.get(position).id);
-        }
     }
 
     /**
