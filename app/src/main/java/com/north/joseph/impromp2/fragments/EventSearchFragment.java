@@ -35,6 +35,8 @@ public class EventSearchFragment extends ListFragment {
     private String mParam2;
 
     private ParseQuery<Event> query;
+    private List<Event> mEvents = null;
+    private boolean queryInProgress = false;
 
     private OnFragmentInteractionListener mListener;
 
@@ -66,28 +68,35 @@ public class EventSearchFragment extends ListFragment {
 
         Log.d("onActivityCreated", "fragment activity created");
 
-        setEmptyText("No events");
+        if (mEvents == null && !queryInProgress) {
+            Log.d("onActivityCreated", "saved state not null");
+            queryInProgress = true;
+            setEmptyText("No events");
 
-        setHasOptionsMenu(true);
+            setHasOptionsMenu(true);
+            setRetainInstance(true);
 
-        mListAdapter = new EventListAdapter(getActivity(), new ArrayList<Event>());
-        setListAdapter(mListAdapter);
+            mListAdapter = new EventListAdapter(getActivity(), new ArrayList<Event>());
+            setListAdapter(mListAdapter);
 
-        setListShown(false);
+            setListShown(false);
 
-        query = ParseQuery.getQuery(Event.class);
-        query.findInBackground(new FindCallback<Event>() {
-            @Override
-            public void done(List<Event> eventList, ParseException e) {
-                if (e == null) {
-                    mListAdapter.clear();
-                    mListAdapter.addAll(eventList);
-                } else {
-                    mListAdapter.addAll(new ArrayList<Event>());
+            query = ParseQuery.getQuery(Event.class);
+            query.findInBackground(new FindCallback<Event>() {
+                @Override
+                public void done(List<Event> eventList, ParseException e) {
+                    if (e == null) {
+                        mListAdapter.clear();
+                        mListAdapter.addAll(eventList);
+                        mEvents = eventList;
+                        queryInProgress = false;
+                    } else {
+                        mListAdapter.addAll(new ArrayList<Event>());
+                    }
+                    setListShown(true);
                 }
-                setListShown(true);
-            }
-        });
+            });
+        }
     }
 
     @Override
