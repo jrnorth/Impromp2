@@ -13,17 +13,27 @@
         android:id="@+id/event_nameTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/event_imageView" />
+        android:layout_toRightOf="@id/event_imageView"
+        android:layout_toLeftOf="@+id/event_disclosureImageView" />
     <TextView
         android:id="@+id/event_timeTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@id/event_imageView"
-        android:layout_below="@id/event_nameTextView" />
+        android:layout_toLeftOf="@id/event_disclosureImageView"
+        android:layout_below="@id/event_nameTextView"/>
     <TextView
         android:id="@+id/event_locationTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@id/event_imageView"
+        android:layout_toLeftOf="@id/event_disclosureImageView"
         android:layout_below="@id/event_timeTextView" />
+    <ImageView
+        android:id="@id/event_disclosureImageView"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:src="@drawable/ic_action_next_item" />
 </RelativeLayout>
