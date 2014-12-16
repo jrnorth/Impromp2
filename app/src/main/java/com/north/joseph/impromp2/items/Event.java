@@ -168,10 +168,14 @@ public class Event extends ParseObject implements Parcelable {
     }
 
     public String getFormattedEndTime() throws ParseException {
-        Date date = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").parse(getString("end_time"));
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        df.setTimeZone(TimeZone.getTimeZone("UTC"));
+        Date date = df.parse(getString("end_time"));
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
-        return new SimpleDateFormat("MMMM d, yyyy hh:mm").format(cal.getTime());
+        df.setTimeZone(TimeZone.getDefault());
+        df.applyPattern("MMMM d, yyyy h:mm a");
+        return df.format(date.getTime());
     }
 
     public String getEndTime() {
