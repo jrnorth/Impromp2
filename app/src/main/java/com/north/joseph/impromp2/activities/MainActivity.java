@@ -3,6 +3,7 @@ package com.north.joseph.impromp2.activities;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.view.GravityCompat;
@@ -17,6 +18,7 @@ import android.widget.ListView;
 
 import com.north.joseph.impromp2.R;
 import com.north.joseph.impromp2.fragments.EventSearchFragment;
+import com.north.joseph.impromp2.items.Event;
 
 
 public class MainActivity extends Activity implements EventSearchFragment.OnFragmentInteractionListener {
@@ -140,7 +142,9 @@ public class MainActivity extends Activity implements EventSearchFragment.OnFrag
         mDrawerToggle.onConfigurationChanged(newConfig);
     }
 
-    public void onFragmentInteraction(String id) {
-
+    public void onFragmentInteraction(Event event) {
+        Intent intent = new Intent(this, EventDetailActivity.class);
+        intent.putExtra("event", event);
+        startActivity(intent);
     }
 }
