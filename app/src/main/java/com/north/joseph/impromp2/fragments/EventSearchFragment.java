@@ -120,6 +120,8 @@ public class EventSearchFragment extends ListFragment {
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
+
+        ((OnFragmentInteractionListener) getActivity()).onFragmentInteraction(mListAdapter.getItem(position));
     }
 
     /**
@@ -134,7 +136,7 @@ public class EventSearchFragment extends ListFragment {
      */
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
-        public void onFragmentInteraction(String id);
+        public void onFragmentInteraction(Event event);
     }
 
 }
