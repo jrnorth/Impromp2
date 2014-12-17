@@ -13,6 +13,7 @@ import com.parse.ParseException;
 import com.parse.ParseQuery;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -25,30 +26,11 @@ import java.util.List;
 public class EventSearchFragment extends ListFragment {
     private EventListAdapter mListAdapter;
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
     private ParseQuery<Event> query;
     private List<Event> mEvents = null;
     private boolean queryInProgress = false;
 
     private OnFragmentInteractionListener mListener;
-
-    // TODO: Rename and change types of parameters
-    public static EventSearchFragment newInstance(String param1, String param2) {
-        EventSearchFragment fragment = new EventSearchFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -68,7 +50,12 @@ public class EventSearchFragment extends ListFragment {
 
         Log.d("onActivityCreated", "fragment activity created");
 
-        if (mEvents == null && !queryInProgress) {
+        fetchEvents(null);
+    }
+
+    public void fetchEvents(String queryStr) {
+        Log.d("fetchEvents", "fetching events...");
+        if (queryStr != null || (mEvents == null && !queryInProgress)) {
             Log.d("onActivityCreated", "saved state not null");
             queryInProgress = true;
             setEmptyText("No events");
@@ -82,6 +69,12 @@ public class EventSearchFragment extends ListFragment {
             setListShown(false);
 
             query = ParseQuery.getQuery(Event.class);
+
+            if (queryStr != null) {
+                List<String> queryWords = Arrays.asList(queryStr.split("\\s+"));
+                query.whereContainsAll("searchable_words", queryWords);
+            }
+
             query.findInBackground(new FindCallback<Event>() {
                 @Override
                 public void done(List<Event> eventList, ParseException e) {
