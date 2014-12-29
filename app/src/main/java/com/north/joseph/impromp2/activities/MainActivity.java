@@ -1,10 +1,14 @@
 package com.north.joseph.impromp2.activities;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.DialogFragment;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.SearchManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -121,6 +125,12 @@ public class MainActivity extends Activity implements EventSearchFragment.OnFrag
             return true;
         }
 
+        if (item.getItemId() == R.id.sort) {
+            SortDialogFragment sortDialogFragment = new SortDialogFragment();
+            sortDialogFragment.show(getFragmentManager(), getString(R.string.sort_dialog_title));
+            return true;
+        }
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -179,5 +189,27 @@ public class MainActivity extends Activity implements EventSearchFragment.OnFrag
         Intent intent = new Intent(this, EventDetailActivity.class);
         intent.putExtra("event", event);
         startActivity(intent);
+    }
+
+    public static class SortDialogFragment extends DialogFragment {
+        public SortDialogFragment() {}
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            return new AlertDialog.Builder(getActivity())
+                    .setTitle(R.string.sort_dialog_title)
+                    .setItems(R.array.sort_options, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            switch (which) {
+                                case 0:
+                                    break;
+                                case 1:
+                                    break;
+                                case 2:
+                                    break;
+                            }
+                        }
+                    }).create();
+        }
     }
 }

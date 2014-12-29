@@ -4,4 +4,10 @@
         <item>Event Search</item>
         <item>Saved Events</item>
     </string-array>
+
+    <string-array name="sort_options">
+        <item>Relevance</item>
+        <item>Distance</item>
+        <item>Time</item>
+    </string-array>
 </resources>
