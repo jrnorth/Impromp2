@@ -30,6 +30,8 @@ public class EventSearchFragment extends ListFragment {
     private List<Event> mEvents = null;
     private boolean queryInProgress = false;
 
+    private String mQuery = null;
+
     private OnFragmentInteractionListener mListener;
 
     /**
@@ -37,6 +39,8 @@ public class EventSearchFragment extends ListFragment {
      * fragment (e.g. upon screen orientation changes).
      */
     public EventSearchFragment() {
+        setHasOptionsMenu(true);
+        setRetainInstance(true);
     }
 
     @Override
@@ -48,20 +52,20 @@ public class EventSearchFragment extends ListFragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        Log.d("onActivityCreated", "fragment activity created");
+        Bundle args = getArguments();
+        if (args != null) {
+            mQuery = args.getString("query");
+        }
 
-        fetchEvents(null);
+        fetchEvents(mQuery);
     }
 
     public void fetchEvents(String queryStr) {
         Log.d("fetchEvents", "fetching events...");
-        if (queryStr != null || (mEvents == null && !queryInProgress)) {
+        if (mEvents == null && !queryInProgress) {
             Log.d("onActivityCreated", "saved state not null");
             queryInProgress = true;
             setEmptyText("No events");
-
-            setHasOptionsMenu(true);
-            setRetainInstance(true);
 
             mListAdapter = new EventListAdapter(getActivity(), new ArrayList<Event>());
             setListAdapter(mListAdapter);

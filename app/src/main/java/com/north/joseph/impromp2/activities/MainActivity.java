@@ -11,7 +11,6 @@ import android.os.Bundle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -76,29 +75,6 @@ public class MainActivity extends Activity implements EventSearchFragment.OnFrag
 
         if (savedInstanceState == null)
             selectItem(0);
-
-        handleIntent(getIntent());
-    }
-
-    @Override
-    protected void onNewIntent(Intent intent) {
-        handleIntent(intent);
-    }
-
-    private void handleIntent(Intent intent) {
-        Log.d("handleIntent", "handling intent...");
-        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-            Log.d("handleIntent", "ACTION_SEARCH");
-            String query = intent.getStringExtra(SearchManager.QUERY);
-
-            EventSearchFragment eventSearchFragment = (EventSearchFragment)
-                    getFragmentManager().findFragmentById(R.id.content_frame);
-
-            if (eventSearchFragment != null) {
-                Log.d("handleIntent", "about to fetch events");
-                eventSearchFragment.fetchEvents(query);
-            }
-        }
     }
 
     @Override

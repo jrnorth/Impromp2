@@ -8,5 +8,6 @@
     <string name="title_activity_event_detail">Event Details</string>
     <string name="search_title">Search</string>
     <string name="search_hint">Search for events</string>
+    <string name="title_activity_search_result">SearchResultActivity</string>
 
 </resources>
