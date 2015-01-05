@@ -10,5 +10,6 @@
     <string name="search_hint">Search for events</string>
     <string name="sort_title">Sort</string>
     <string name="sort_dialog_title">Choose a sorting method</string>
+    <string name="title_activity_search_result">SearchResultActivity</string>
 
 </resources>
