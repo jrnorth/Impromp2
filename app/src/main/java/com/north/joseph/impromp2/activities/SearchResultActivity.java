@@ -61,6 +61,8 @@ public class SearchResultActivity extends FragmentActivity implements EventSearc
     }
 
     public void onFragmentInteraction(Event event) {
-
+        Intent intent = new Intent(this, EventDetailActivity.class);
+        intent.putExtra("event", event);
+        startActivity(intent);
     }
 }
