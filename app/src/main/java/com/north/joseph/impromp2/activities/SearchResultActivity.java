@@ -10,9 +10,12 @@ import android.view.MenuItem;
 
 import com.north.joseph.impromp2.R;
 import com.north.joseph.impromp2.fragments.EventSearchFragment;
+import com.north.joseph.impromp2.fragments.SortDialogFragment;
+import com.north.joseph.impromp2.interfaces.Queryable;
 import com.north.joseph.impromp2.items.Event;
 
-public class SearchResultActivity extends FragmentActivity implements EventSearchFragment.OnFragmentInteractionListener {
+public class SearchResultActivity extends FragmentActivity implements EventSearchFragment.OnFragmentInteractionListener,
+        Queryable {
     private static EventSearchFragment mEventSearchFragment;
     private static String mQuery;
 
@@ -52,8 +55,10 @@ public class SearchResultActivity extends FragmentActivity implements EventSearc
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.sort) {
+            SortDialogFragment sortDialogFragment = new SortDialogFragment();
+            sortDialogFragment.setUp(mEventSearchFragment, this);
+            sortDialogFragment.show(getFragmentManager(), getString(R.string.sort_dialog_title));
             return true;
         }
 
@@ -64,5 +69,9 @@ public class SearchResultActivity extends FragmentActivity implements EventSearc
         Intent intent = new Intent(this, EventDetailActivity.class);
         intent.putExtra("event", event);
         startActivity(intent);
+    }
+
+    public String getQuery() {
+        return mQuery;
     }
 }

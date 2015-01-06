@@ -1,14 +1,10 @@
 package com.north.joseph.impromp2.activities;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.app.DialogFragment;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.SearchManager;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -25,10 +21,13 @@ import android.widget.SearchView;
 
 import com.north.joseph.impromp2.R;
 import com.north.joseph.impromp2.fragments.EventSearchFragment;
+import com.north.joseph.impromp2.fragments.SortDialogFragment;
+import com.north.joseph.impromp2.interfaces.Queryable;
 import com.north.joseph.impromp2.items.Event;
 
 
-public class MainActivity extends Activity implements EventSearchFragment.OnFragmentInteractionListener {
+public class MainActivity extends Activity implements EventSearchFragment.OnFragmentInteractionListener,
+        Queryable {
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mDrawerToggle;
     private ListView mDrawerList;
@@ -36,6 +35,8 @@ public class MainActivity extends Activity implements EventSearchFragment.OnFrag
     private CharSequence mDrawerTitle;
     private CharSequence mTitle;
     private String[] mDrawerTitles;
+
+    private static EventSearchFragment mEventSearchFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,6 +104,7 @@ public class MainActivity extends Activity implements EventSearchFragment.OnFrag
 
         if (item.getItemId() == R.id.sort) {
             SortDialogFragment sortDialogFragment = new SortDialogFragment();
+            sortDialogFragment.setUp(mEventSearchFragment, this);
             sortDialogFragment.show(getFragmentManager(), getString(R.string.sort_dialog_title));
             return true;
         }
@@ -136,6 +138,8 @@ public class MainActivity extends Activity implements EventSearchFragment.OnFrag
                 .replace(R.id.content_frame, fragment)
                 .commit();
 
+        mEventSearchFragment = (EventSearchFragment) fragment;
+
         mDrawerList.setItemChecked(position, true);
         setTitle(mDrawerTitles[position]);
         mDrawerLayout.closeDrawer(mDrawerList);
@@ -167,25 +171,7 @@ public class MainActivity extends Activity implements EventSearchFragment.OnFrag
         startActivity(intent);
     }
 
-    public static class SortDialogFragment extends DialogFragment {
-        public SortDialogFragment() {}
-
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            return new AlertDialog.Builder(getActivity())
-                    .setTitle(R.string.sort_dialog_title)
-                    .setItems(R.array.sort_options, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            switch (which) {
-                                case 0:
-                                    break;
-                                case 1:
-                                    break;
-                                case 2:
-                                    break;
-                            }
-                        }
-                    }).create();
-        }
+    public String getQuery() {
+        return null;
     }
 }

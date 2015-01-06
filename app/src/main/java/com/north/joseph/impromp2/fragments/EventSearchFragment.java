@@ -57,12 +57,12 @@ public class EventSearchFragment extends ListFragment {
             mQuery = args.getString("query");
         }
 
-        fetchEvents(mQuery);
+        fetchEvents(mQuery, false);
     }
 
-    public void fetchEvents(String queryStr) {
+    public void fetchEvents(String queryStr, boolean refetch) {
         Log.d("fetchEvents", "fetching events...");
-        if (mEvents == null && !queryInProgress) {
+        if ((mEvents == null && !queryInProgress) || refetch) {
             Log.d("onActivityCreated", "saved state not null");
             queryInProgress = true;
             setEmptyText("No events");
