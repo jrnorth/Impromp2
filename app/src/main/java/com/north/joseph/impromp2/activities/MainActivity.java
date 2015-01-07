@@ -104,7 +104,6 @@ public class MainActivity extends Activity implements EventSearchFragment.OnFrag
 
         if (item.getItemId() == R.id.sort) {
             SortDialogFragment sortDialogFragment = new SortDialogFragment();
-            sortDialogFragment.setUp(mEventSearchFragment, this);
             sortDialogFragment.show(getFragmentManager(), getString(R.string.sort_dialog_title));
             return true;
         }

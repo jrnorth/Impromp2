@@ -1,5 +1,6 @@
 package com.north.joseph.impromp2.fragments;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
@@ -8,6 +9,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 
 import com.north.joseph.impromp2.R;
+import com.north.joseph.impromp2.activities.MainActivity;
 import com.north.joseph.impromp2.interfaces.PersistableChoice;
 import com.north.joseph.impromp2.interfaces.Queryable;
 
@@ -22,13 +24,24 @@ public class SortDialogFragment extends DialogFragment {
 
     public SortDialogFragment() {
         // Required empty public constructor
-        setRetainInstance(true);
     }
 
-    public void setUp(EventSearchFragment e, Queryable q) {
-        mEventSearchFragment = e;
-        mQueryable = q;
-        mPersistableChoice = e;
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+
+        mQueryable = (Queryable) activity;
+
+        if (activity instanceof MainActivity) {
+            mEventSearchFragment = (EventSearchFragment)
+                    activity.getFragmentManager().findFragmentById(R.id.content_frame);
+        } else {
+            mEventSearchFragment = (EventSearchFragment)
+                    activity.getFragmentManager().findFragmentById(android.R.id.content);
+        }
+
+        mPersistableChoice = mEventSearchFragment;
+
         mSelectedItem = mPersistableChoice.getLastSortingChoice();
     }
 
