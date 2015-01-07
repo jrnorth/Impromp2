@@ -12,6 +12,7 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
+import com.north.joseph.impromp2.interfaces.PersistableChoice;
 import com.north.joseph.impromp2.items.Event;
 import com.parse.FindCallback;
 import com.parse.ParseException;
@@ -30,7 +31,8 @@ import java.util.List;
  * interface.
  */
 public class EventSearchFragment extends ListFragment
-        implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+        implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
+        PersistableChoice {
     private EventListAdapter mListAdapter;
 
     private ParseQuery<Event> query;
@@ -43,6 +45,8 @@ public class EventSearchFragment extends ListFragment
 
     private GoogleApiClient mGoogleApiClient;
     private static boolean mGoogleApiConnected = false;
+
+    private int mLastSortingChoice = 0;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -190,4 +194,11 @@ public class EventSearchFragment extends ListFragment
         public void onFragmentInteraction(Event event);
     }
 
+    public int getLastSortingChoice() {
+        return mLastSortingChoice;
+    }
+
+    public void setSortingChoice(int newChoice) {
+        mLastSortingChoice = newChoice;
+    }
 }

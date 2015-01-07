@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 
 import com.north.joseph.impromp2.R;
+import com.north.joseph.impromp2.interfaces.PersistableChoice;
 import com.north.joseph.impromp2.interfaces.Queryable;
 
 /**
@@ -16,6 +17,8 @@ import com.north.joseph.impromp2.interfaces.Queryable;
 public class SortDialogFragment extends DialogFragment {
     private EventSearchFragment mEventSearchFragment;
     private Queryable mQueryable;
+    private PersistableChoice mPersistableChoice;
+    private int mSelectedItem;
 
     public SortDialogFragment() {
         // Required empty public constructor
@@ -25,26 +28,53 @@ public class SortDialogFragment extends DialogFragment {
     public void setUp(EventSearchFragment e, Queryable q) {
         mEventSearchFragment = e;
         mQueryable = q;
+        mPersistableChoice = e;
+        mSelectedItem = mPersistableChoice.getLastSortingChoice();
     }
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        return new AlertDialog.Builder(getActivity())
-                .setTitle(R.string.sort_dialog_title)
-                .setItems(R.array.sort_options, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        switch (which) {
-                            case 0:
-                                mEventSearchFragment.fetchEvents(mQueryable.getQuery(), true, "");
-                                break;
-                            case 1:
-                                mEventSearchFragment.fetchEvents(mQueryable.getQuery(), true, "distance");
-                                break;
-                            case 2:
-                                mEventSearchFragment.fetchEvents(mQueryable.getQuery(), true, "start_time");
-                                break;
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        // Set the dialog title
+        builder.setTitle(R.string.sort_dialog_title)
+            // Specify the list array, the items to be selected by default (null for none),
+            // and the listener through which to receive callbacks when items are selected
+            .setSingleChoiceItems(R.array.sort_options, mPersistableChoice.getLastSortingChoice(),
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            mSelectedItem = which;
                         }
+                    })
+                    // Set the action buttons
+            .setPositiveButton("Sort", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int id) {
+                    if (mSelectedItem == mPersistableChoice.getLastSortingChoice())
+                        return;
+
+                    mPersistableChoice.setSortingChoice(mSelectedItem);
+
+                    switch (mSelectedItem) {
+                        case 0:
+                            mEventSearchFragment.fetchEvents(mQueryable.getQuery(), true, "");
+                            break;
+                        case 1:
+                            mEventSearchFragment.fetchEvents(mQueryable.getQuery(), true, "distance");
+                            break;
+                        case 2:
+                            mEventSearchFragment.fetchEvents(mQueryable.getQuery(), true, "start_time");
+                            break;
                     }
-                }).create();
+                }
+            })
+            .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int id) {
+                    // Empty.
+                }
+            });
+
+        return builder.create();
     }
 }
