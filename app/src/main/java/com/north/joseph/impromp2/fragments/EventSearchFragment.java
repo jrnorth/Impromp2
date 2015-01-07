@@ -129,8 +129,6 @@ public class EventSearchFragment extends ListFragment
                         mListAdapter.addAll(eventList);
                         mEvents = eventList;
                         queryInProgress = false;
-                    } else {
-                        mListAdapter.addAll(new ArrayList<Event>());
                     }
                     setListShown(true);
                 }
