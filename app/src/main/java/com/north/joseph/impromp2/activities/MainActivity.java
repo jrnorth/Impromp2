@@ -21,10 +21,13 @@ import android.widget.SearchView;
 
 import com.north.joseph.impromp2.R;
 import com.north.joseph.impromp2.fragments.EventSearchFragment;
+import com.north.joseph.impromp2.fragments.SortDialogFragment;
+import com.north.joseph.impromp2.interfaces.Queryable;
 import com.north.joseph.impromp2.items.Event;
 
 
-public class MainActivity extends Activity implements EventSearchFragment.OnFragmentInteractionListener {
+public class MainActivity extends Activity implements EventSearchFragment.OnFragmentInteractionListener,
+        Queryable {
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mDrawerToggle;
     private ListView mDrawerList;
@@ -32,6 +35,8 @@ public class MainActivity extends Activity implements EventSearchFragment.OnFrag
     private CharSequence mDrawerTitle;
     private CharSequence mTitle;
     private String[] mDrawerTitles;
+
+    private static EventSearchFragment mEventSearchFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,6 +102,13 @@ public class MainActivity extends Activity implements EventSearchFragment.OnFrag
             return true;
         }
 
+        if (item.getItemId() == R.id.sort) {
+            SortDialogFragment sortDialogFragment = new SortDialogFragment();
+            sortDialogFragment.setUp(mEventSearchFragment, this);
+            sortDialogFragment.show(getFragmentManager(), getString(R.string.sort_dialog_title));
+            return true;
+        }
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -125,6 +137,8 @@ public class MainActivity extends Activity implements EventSearchFragment.OnFrag
         fragmentManager.beginTransaction()
                 .replace(R.id.content_frame, fragment)
                 .commit();
+
+        mEventSearchFragment = (EventSearchFragment) fragment;
 
         mDrawerList.setItemChecked(position, true);
         setTitle(mDrawerTitles[position]);
@@ -155,5 +169,9 @@ public class MainActivity extends Activity implements EventSearchFragment.OnFrag
         Intent intent = new Intent(this, EventDetailActivity.class);
         intent.putExtra("event", event);
         startActivity(intent);
+    }
+
+    public String getQuery() {
+        return null;
     }
 }

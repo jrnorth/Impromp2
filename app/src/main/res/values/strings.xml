@@ -8,6 +8,8 @@
     <string name="title_activity_event_detail">Event Details</string>
     <string name="search_title">Search</string>
     <string name="search_hint">Search for events</string>
+    <string name="sort_title">Sort</string>
+    <string name="sort_dialog_title">Sort by...</string>
     <string name="title_activity_search_result">SearchResultActivity</string>
 
 </resources>
