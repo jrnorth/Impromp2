@@ -10,4 +10,27 @@
         <item>Distance</item>
         <item>Time</item>
     </string-array>
+
+    <string-array name="filter_options">
+        <item>Arts</item>
+        <item>Auto, Boat &amp; Air</item>
+        <item>Business</item>
+        <item>Charity &amp; Causes</item>
+        <item>Community</item>
+        <item>Family &amp; Education</item>
+        <item>Fashion</item>
+        <item>Film &amp; Media</item>
+        <item>Food &amp; Drink</item>
+        <item>Government</item>
+        <item>Health</item>
+        <item>Hobbies</item>
+        <item>Holiday</item>
+        <item>Home &amp; Lifestyle</item>
+        <item>Music</item>
+        <item>Other</item>
+        <item>Science &amp; Tech</item>
+        <item>Spirituality</item>
+        <item>Sports &amp; Fitness</item>
+        <item>Travel &amp; Outdoor</item>
+    </string-array>
 </resources>

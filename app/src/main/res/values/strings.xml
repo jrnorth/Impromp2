@@ -11,5 +11,7 @@
     <string name="sort_title">Sort</string>
     <string name="sort_dialog_title">Sort by...</string>
     <string name="title_activity_search_result">SearchResultActivity</string>
+    <string name="title_activity_filter">Apply filters</string>
+    <string name="filter_title">Filter</string>
 
 </resources>

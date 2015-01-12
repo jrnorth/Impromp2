@@ -102,9 +102,15 @@ public class MainActivity extends Activity implements EventSearchFragment.OnFrag
             return true;
         }
 
-        if (item.getItemId() == R.id.sort) {
+        int id = item.getItemId();
+
+        if (id == R.id.sort) {
             SortDialogFragment sortDialogFragment = new SortDialogFragment();
             sortDialogFragment.show(getFragmentManager(), getString(R.string.sort_dialog_title));
+            return true;
+        } else if (id == R.id.filter) {
+            Intent intent = new Intent(this, FilterActivity.class);
+            startActivity(intent);
             return true;
         }
 

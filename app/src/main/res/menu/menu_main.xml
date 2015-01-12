@@ -5,6 +5,8 @@
         android:actionViewClass="android.widget.SearchView" />
     <item android:id="@+id/sort" android:title="@string/sort_title"
         android:icon="@drawable/ic_action_sort_by_size" android:showAsAction="always" />
+    <item android:id="@+id/filter" android:title="@string/filter_title"
+        android:icon="@drawable/ic_action_filter_icon" android:showAsAction="always" />
 
     <item android:id="@+id/action_settings" android:title="@string/action_settings"
         android:orderInCategory="100" android:showAsAction="never" />

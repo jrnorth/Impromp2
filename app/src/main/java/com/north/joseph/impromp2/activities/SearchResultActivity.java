@@ -59,6 +59,10 @@ public class SearchResultActivity extends FragmentActivity implements EventSearc
             SortDialogFragment sortDialogFragment = new SortDialogFragment();
             sortDialogFragment.show(getFragmentManager(), getString(R.string.sort_dialog_title));
             return true;
+        } else if (id == R.id.filter) {
+            Intent intent = new Intent(this, FilterActivity.class);
+            startActivity(intent);
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
