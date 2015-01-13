@@ -16,6 +16,7 @@ import com.north.joseph.impromp2.views.FilterViewHolder;
  * Created by Joe on 1/8/2015.
  */
 public class FilterAdapter extends BaseExpandableListAdapter {
+    public static final String CHECKED_FILTERS = "cf";
     private final Context mContext;
     private final String[] mCategories;
     private boolean[] mChecked;
@@ -24,6 +25,16 @@ public class FilterAdapter extends BaseExpandableListAdapter {
         mContext = context;
         mCategories = context.getResources().getStringArray(R.array.filter_options);
         mChecked = new boolean[1 + mCategories.length];
+    }
+
+    public FilterAdapter(Context context, boolean[] checked) {
+        mContext = context;
+        mCategories = context.getResources().getStringArray(R.array.filter_options);
+        mChecked = checked;
+    }
+
+    public boolean[] getChecked() {
+        return mChecked;
     }
 
     @Override

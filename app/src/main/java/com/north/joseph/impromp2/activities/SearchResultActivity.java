@@ -9,6 +9,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.north.joseph.impromp2.R;
+import com.north.joseph.impromp2.adapters.FilterAdapter;
 import com.north.joseph.impromp2.fragments.EventSearchFragment;
 import com.north.joseph.impromp2.fragments.SortDialogFragment;
 import com.north.joseph.impromp2.interfaces.Queryable;
@@ -18,6 +19,7 @@ public class SearchResultActivity extends FragmentActivity implements EventSearc
         Queryable {
     private static EventSearchFragment mEventSearchFragment;
     private static String mQuery;
+    private boolean[] mCheckedFilters;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,7 +37,11 @@ public class SearchResultActivity extends FragmentActivity implements EventSearc
                 mEventSearchFragment.setArguments(args);
             }
 
+            mCheckedFilters = intent.getBooleanArrayExtra(FilterAdapter.CHECKED_FILTERS);
+
             getFragmentManager().beginTransaction().add(android.R.id.content, mEventSearchFragment).commit();
+        } else {
+            mCheckedFilters = savedInstanceState.getBooleanArray(FilterAdapter.CHECKED_FILTERS);
         }
 
         setTitle("results for \"" + mQuery + "\"");
@@ -61,11 +67,29 @@ public class SearchResultActivity extends FragmentActivity implements EventSearc
             return true;
         } else if (id == R.id.filter) {
             Intent intent = new Intent(this, FilterActivity.class);
-            startActivity(intent);
+            intent.putExtra(FilterAdapter.CHECKED_FILTERS, mCheckedFilters);
+            startActivityForResult(intent, 0);
             return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 0) {
+            if (resultCode == RESULT_OK) {
+                mCheckedFilters = data.getBooleanArrayExtra(FilterAdapter.CHECKED_FILTERS);
+                mEventSearchFragment.fetchEvents(mQuery, true, "");
+            }
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putBooleanArray(FilterAdapter.CHECKED_FILTERS, mCheckedFilters);
     }
 
     public void onFragmentInteraction(Event event) {

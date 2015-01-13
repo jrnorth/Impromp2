@@ -20,11 +20,13 @@ import android.widget.ListView;
 import android.widget.SearchView;
 
 import com.north.joseph.impromp2.R;
+import com.north.joseph.impromp2.adapters.FilterAdapter;
 import com.north.joseph.impromp2.fragments.EventSearchFragment;
 import com.north.joseph.impromp2.fragments.SortDialogFragment;
 import com.north.joseph.impromp2.interfaces.Queryable;
 import com.north.joseph.impromp2.items.Event;
 
+import java.util.logging.Filter;
 
 public class MainActivity extends Activity implements EventSearchFragment.OnFragmentInteractionListener,
         Queryable {
@@ -35,6 +37,8 @@ public class MainActivity extends Activity implements EventSearchFragment.OnFrag
     private CharSequence mDrawerTitle;
     private CharSequence mTitle;
     private String[] mDrawerTitles;
+
+    private boolean[] mCheckedFilters;
 
     private static EventSearchFragment mEventSearchFragment;
 
@@ -78,8 +82,18 @@ public class MainActivity extends Activity implements EventSearchFragment.OnFrag
 
         mDrawerLayout.setDrawerListener(mDrawerToggle);
 
-        if (savedInstanceState == null)
+        if (savedInstanceState == null) {
             selectItem(0);
+            mCheckedFilters = null;
+        } else
+            mCheckedFilters = savedInstanceState.getBooleanArray(FilterAdapter.CHECKED_FILTERS);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putBooleanArray(FilterAdapter.CHECKED_FILTERS, mCheckedFilters);
     }
 
     @Override
@@ -97,6 +111,15 @@ public class MainActivity extends Activity implements EventSearchFragment.OnFrag
     }
 
     @Override
+    public void startActivity(Intent intent) {
+        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+            intent.putExtra(FilterAdapter.CHECKED_FILTERS, mCheckedFilters);
+        }
+
+        super.startActivity(intent);
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (mDrawerToggle.onOptionsItemSelected(item)) {
             return true;
@@ -110,11 +133,22 @@ public class MainActivity extends Activity implements EventSearchFragment.OnFrag
             return true;
         } else if (id == R.id.filter) {
             Intent intent = new Intent(this, FilterActivity.class);
-            startActivity(intent);
+            intent.putExtra(FilterAdapter.CHECKED_FILTERS, mCheckedFilters);
+            startActivityForResult(intent, 0);
             return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 0) {
+            if (resultCode == RESULT_OK) {
+                mCheckedFilters = data.getBooleanArrayExtra(FilterAdapter.CHECKED_FILTERS);
+                mEventSearchFragment.fetchEvents(null, true, "");
+            }
+        }
     }
 
     private class DrawerItemClickListener implements ListView.OnItemClickListener {
