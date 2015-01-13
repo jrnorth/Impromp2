@@ -10,6 +10,7 @@ import android.widget.CheckedTextView;
 import android.widget.TextView;
 
 import com.north.joseph.impromp2.R;
+import com.north.joseph.impromp2.activities.FilterActivity;
 import com.north.joseph.impromp2.views.FilterViewHolder;
 
 /**
@@ -18,17 +19,20 @@ import com.north.joseph.impromp2.views.FilterViewHolder;
 public class FilterAdapter extends BaseExpandableListAdapter {
     public static final String CHECKED_FILTERS = "cf";
     private final Context mContext;
+    private final FilterActivity mFilterActivity;
     private final String[] mCategories;
     private boolean[] mChecked;
 
-    public FilterAdapter(Context context) {
+    public FilterAdapter(Context context, FilterActivity filterActivity) {
         mContext = context;
+        mFilterActivity = filterActivity;
         mCategories = context.getResources().getStringArray(R.array.filter_options);
         mChecked = new boolean[1 + mCategories.length];
     }
 
-    public FilterAdapter(Context context, boolean[] checked) {
+    public FilterAdapter(Context context, FilterActivity filterActivity, boolean[] checked) {
         mContext = context;
+        mFilterActivity = filterActivity;
         mCategories = context.getResources().getStringArray(R.array.filter_options);
         mChecked = checked;
     }
@@ -118,6 +122,7 @@ public class FilterAdapter extends BaseExpandableListAdapter {
             public void onClick(View v) {
                 mChecked[groupPosition + childPosition] = !mChecked[groupPosition + childPosition];
                 checkedTextView.toggle();
+                mFilterActivity.filterToggled();
             }
         });
 

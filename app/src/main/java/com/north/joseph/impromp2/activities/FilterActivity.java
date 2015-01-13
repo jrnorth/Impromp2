@@ -9,8 +9,12 @@ import android.widget.ExpandableListView;
 import com.north.joseph.impromp2.R;
 import com.north.joseph.impromp2.adapters.FilterAdapter;
 
+import java.util.Arrays;
+
 public class FilterActivity extends Activity {
+    private static final String ORIGINAL_CHECKED_FILTERS = "ocf";
     private FilterAdapter mListAdapter;
+    private boolean[] mOriginalChecked;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,17 +28,34 @@ public class FilterActivity extends Activity {
 
         if (savedInstanceState != null) {
             final boolean[] checked = savedInstanceState.getBooleanArray(FilterAdapter.CHECKED_FILTERS);
-            mListAdapter = new FilterAdapter(getApplicationContext(), checked);
+            mListAdapter = new FilterAdapter(getApplicationContext(), this, checked);
+            mOriginalChecked = savedInstanceState.getBooleanArray(ORIGINAL_CHECKED_FILTERS);
         } else {
             Intent intent = getIntent();
-            final boolean[] checked = intent.getBooleanArrayExtra(FilterAdapter.CHECKED_FILTERS);
-            if (checked != null)
-                mListAdapter = new FilterAdapter(getApplicationContext(), checked);
-            else
-                mListAdapter = new FilterAdapter(getApplicationContext());
+            boolean[] checked = intent.getBooleanArrayExtra(FilterAdapter.CHECKED_FILTERS);
+            if (checked != null) {
+                mListAdapter = new FilterAdapter(getApplicationContext(), this, checked);
+            } else {
+                mListAdapter = new FilterAdapter(getApplicationContext(), this);
+                checked = mListAdapter.getChecked();
+            }
+            mOriginalChecked = Arrays.copyOf(checked, checked.length);
         }
 
+        filterToggled();
+
         expandableListView.setAdapter(mListAdapter);
+    }
+
+    private boolean didFiltersChange() {
+        return !Arrays.equals(mListAdapter.getChecked(), mOriginalChecked);
+    }
+
+    public void filterToggled() {
+        if (didFiltersChange())
+            setTitle(getResources().getString(R.string.title_activity_filter));
+        else
+            setTitle("Back to events");
     }
 
     @Override
@@ -42,7 +63,12 @@ public class FilterActivity extends Activity {
         if (item.getItemId() == android.R.id.home) {
             Intent intent = new Intent();
             intent.putExtra(FilterAdapter.CHECKED_FILTERS, mListAdapter.getChecked());
-            setResult(RESULT_OK, intent);
+
+            if (didFiltersChange())
+                setResult(RESULT_OK, intent);
+            else
+                setResult(RESULT_CANCELED);
+
             onBackPressed();
             return true;
         }
@@ -55,5 +81,6 @@ public class FilterActivity extends Activity {
         super.onSaveInstanceState(outState);
 
         outState.putBooleanArray(FilterAdapter.CHECKED_FILTERS, mListAdapter.getChecked());
+        outState.putBooleanArray(ORIGINAL_CHECKED_FILTERS, mOriginalChecked);
     }
 }
