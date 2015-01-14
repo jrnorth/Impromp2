@@ -12,6 +12,8 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
+import com.north.joseph.impromp2.R;
+import com.north.joseph.impromp2.interfaces.Filterable;
 import com.north.joseph.impromp2.interfaces.PersistableChoice;
 import com.north.joseph.impromp2.items.Event;
 import com.parse.FindCallback;
@@ -21,6 +23,8 @@ import com.parse.ParseQuery;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -47,6 +51,8 @@ public class EventSearchFragment extends ListFragment
     private static boolean mGoogleApiConnected = false;
 
     private int mLastSortingChoice = 0;
+
+    private static List<String> FILTER_OPTIONS = null;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -125,6 +131,20 @@ public class EventSearchFragment extends ListFragment
                 query.addAscendingOrder(sortBy);
             }
 
+            final boolean[] filterOptions = ((Filterable) mListener).getFilterOptions();
+            if (filterOptions != null) {
+                if (filterOptions[0])
+                    query.whereEqualTo("free", Boolean.TRUE);
+
+                LinkedList<String> queryFilters = new LinkedList<>();
+                for (int i = 1; i < filterOptions.length; ++i) {
+                    if (filterOptions[i])
+                        queryFilters.add(FILTER_OPTIONS.get(i - 1));
+                }
+                if (!queryFilters.isEmpty())
+                    query.whereContainedIn("category", queryFilters);
+            }
+
             query.findInBackground(new FindCallback<Event>() {
                 @Override
                 public void done(List<Event> eventList, ParseException e) {
@@ -148,6 +168,11 @@ public class EventSearchFragment extends ListFragment
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement OnFragmentInteractionListener");
+        }
+
+        if (FILTER_OPTIONS == null) {
+            String[] filterOptions = getResources().getStringArray(R.array.filter_options);
+            FILTER_OPTIONS = Arrays.asList(filterOptions);
         }
     }
 

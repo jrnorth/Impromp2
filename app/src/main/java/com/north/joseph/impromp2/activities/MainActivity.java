@@ -23,13 +23,14 @@ import com.north.joseph.impromp2.R;
 import com.north.joseph.impromp2.adapters.FilterAdapter;
 import com.north.joseph.impromp2.fragments.EventSearchFragment;
 import com.north.joseph.impromp2.fragments.SortDialogFragment;
+import com.north.joseph.impromp2.interfaces.Filterable;
 import com.north.joseph.impromp2.interfaces.Queryable;
 import com.north.joseph.impromp2.items.Event;
 
 import java.util.logging.Filter;
 
 public class MainActivity extends Activity implements EventSearchFragment.OnFragmentInteractionListener,
-        Queryable {
+        Filterable, Queryable {
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mDrawerToggle;
     private ListView mDrawerList;
@@ -149,6 +150,11 @@ public class MainActivity extends Activity implements EventSearchFragment.OnFrag
                 mEventSearchFragment.fetchEvents(null, true, "");
             }
         }
+    }
+
+    @Override
+    public boolean[] getFilterOptions() {
+        return mCheckedFilters;
     }
 
     private class DrawerItemClickListener implements ListView.OnItemClickListener {

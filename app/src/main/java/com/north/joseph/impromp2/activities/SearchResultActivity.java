@@ -12,11 +12,12 @@ import com.north.joseph.impromp2.R;
 import com.north.joseph.impromp2.adapters.FilterAdapter;
 import com.north.joseph.impromp2.fragments.EventSearchFragment;
 import com.north.joseph.impromp2.fragments.SortDialogFragment;
+import com.north.joseph.impromp2.interfaces.Filterable;
 import com.north.joseph.impromp2.interfaces.Queryable;
 import com.north.joseph.impromp2.items.Event;
 
 public class SearchResultActivity extends FragmentActivity implements EventSearchFragment.OnFragmentInteractionListener,
-        Queryable {
+        Filterable, Queryable {
     private static EventSearchFragment mEventSearchFragment;
     private static String mQuery;
     private boolean[] mCheckedFilters;
@@ -100,5 +101,10 @@ public class SearchResultActivity extends FragmentActivity implements EventSearc
 
     public String getQuery() {
         return mQuery;
+    }
+
+    @Override
+    public boolean[] getFilterOptions() {
+        return mCheckedFilters;
     }
 }
