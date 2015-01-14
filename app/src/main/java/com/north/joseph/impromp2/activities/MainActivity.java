@@ -156,6 +156,8 @@ public class MainActivity extends Activity implements EventSearchFragment.OnFrag
         super.onPostCreate(savedInstanceState);
         // Sync the toggle state after onRestoreInstanceState has occurred.
         mDrawerToggle.syncState();
+        if (savedInstanceState != null)
+            setTitle(mDrawerTitles[mDrawerList.getCheckedItemPosition()]);
     }
 
     @Override
