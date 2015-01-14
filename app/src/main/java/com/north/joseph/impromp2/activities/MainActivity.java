@@ -25,7 +25,6 @@ import com.north.joseph.impromp2.fragments.SortDialogFragment;
 import com.north.joseph.impromp2.interfaces.Queryable;
 import com.north.joseph.impromp2.items.Event;
 
-
 public class MainActivity extends Activity implements EventSearchFragment.OnFragmentInteractionListener,
         Queryable {
     private DrawerLayout mDrawerLayout;
@@ -51,7 +50,7 @@ public class MainActivity extends Activity implements EventSearchFragment.OnFrag
         mDrawerList = (ListView) findViewById(R.id.left_drawer);
 
         mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
-        mDrawerList.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, mDrawerTitles));
+        mDrawerList.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_activated_1, mDrawerTitles));
         mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
 
         getActionBar().setDisplayHomeAsUpEnabled(true);
@@ -119,28 +118,30 @@ public class MainActivity extends Activity implements EventSearchFragment.OnFrag
     }
 
     private void selectItem(int position) {
-        FragmentManager fragmentManager = getFragmentManager();
-        Fragment fragment;
+        if (!mTitle.equals(mDrawerTitles[position])) {
+            FragmentManager fragmentManager = getFragmentManager();
+            Fragment fragment;
 
-        switch (position) {
-            case 0:
-                fragment = new EventSearchFragment();
-                break;
-            case 1:
-                fragment = new EventSearchFragment();
-                break;
-            default:
-                fragment = new EventSearchFragment();
+            switch (position) {
+                case 0:
+                    fragment = new EventSearchFragment();
+                    break;
+                case 1:
+                    fragment = new EventSearchFragment();
+                    break;
+                default:
+                    fragment = new EventSearchFragment();
+            }
+
+            fragmentManager.beginTransaction()
+                    .replace(R.id.content_frame, fragment)
+                    .commit();
+
+            mEventSearchFragment = (EventSearchFragment) fragment;
+
+            mDrawerList.setItemChecked(position, true);
+            setTitle(mDrawerTitles[position]);
         }
-
-        fragmentManager.beginTransaction()
-                .replace(R.id.content_frame, fragment)
-                .commit();
-
-        mEventSearchFragment = (EventSearchFragment) fragment;
-
-        mDrawerList.setItemChecked(position, true);
-        setTitle(mDrawerTitles[position]);
         mDrawerLayout.closeDrawer(mDrawerList);
     }
 
