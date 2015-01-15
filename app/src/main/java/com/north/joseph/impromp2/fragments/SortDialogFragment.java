@@ -3,13 +3,15 @@ package com.north.joseph.impromp2.fragments;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.DialogFragment;
 import android.app.Fragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentActivity;
 
 import com.north.joseph.impromp2.R;
 import com.north.joseph.impromp2.activities.MainActivity;
+import com.north.joseph.impromp2.activities.SearchResultActivity;
 import com.north.joseph.impromp2.interfaces.PersistableChoice;
 import com.north.joseph.impromp2.interfaces.Queryable;
 
@@ -26,19 +28,16 @@ public class SortDialogFragment extends DialogFragment {
         // Required empty public constructor
     }
 
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
+    private void prepareFragment() {
+        Activity activity = getActivity();
 
         mQueryable = (Queryable) activity;
 
-        if (activity instanceof MainActivity) {
+        if (activity instanceof MainActivity)
+            mEventSearchFragment = (EventSearchFragment) ((MainActivity) activity).getCurrentFragment();
+        else if (activity instanceof SearchResultActivity)
             mEventSearchFragment = (EventSearchFragment)
-                    activity.getFragmentManager().findFragmentById(R.id.content_frame);
-        } else {
-            mEventSearchFragment = (EventSearchFragment)
-                    activity.getFragmentManager().findFragmentById(android.R.id.content);
-        }
+                    ((FragmentActivity) activity).getSupportFragmentManager().findFragmentById(android.R.id.content);
 
         mPersistableChoice = mEventSearchFragment;
 
@@ -48,6 +47,7 @@ public class SortDialogFragment extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        prepareFragment();
         // Set the dialog title
         builder.setTitle(R.string.sort_dialog_title)
             // Specify the list array, the items to be selected by default (null for none),

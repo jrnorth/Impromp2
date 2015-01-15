@@ -40,7 +40,7 @@ public class SearchResultActivity extends FragmentActivity implements EventSearc
 
             mCheckedFilters = intent.getBooleanArrayExtra(FilterAdapter.CHECKED_FILTERS);
 
-            getFragmentManager().beginTransaction().add(android.R.id.content, mEventSearchFragment).commit();
+            getSupportFragmentManager().beginTransaction().add(android.R.id.content, mEventSearchFragment).commit();
         } else {
             mCheckedFilters = savedInstanceState.getBooleanArray(FilterAdapter.CHECKED_FILTERS);
         }
@@ -64,7 +64,7 @@ public class SearchResultActivity extends FragmentActivity implements EventSearc
 
         if (id == R.id.sort) {
             SortDialogFragment sortDialogFragment = new SortDialogFragment();
-            sortDialogFragment.show(getFragmentManager(), getString(R.string.sort_dialog_title));
+            sortDialogFragment.show(getSupportFragmentManager(), getString(R.string.sort_dialog_title));
             return true;
         } else if (id == R.id.filter) {
             Intent intent = new Intent(this, FilterActivity.class);

@@ -1,22 +1,16 @@
 package com.north.joseph.impromp2.activities;
 
-import android.app.Activity;
-import android.app.Fragment;
-import android.app.FragmentManager;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.os.Bundle;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
 import android.widget.SearchView;
 
 import com.north.joseph.impromp2.R;
@@ -27,66 +21,24 @@ import com.north.joseph.impromp2.interfaces.Filterable;
 import com.north.joseph.impromp2.interfaces.Queryable;
 import com.north.joseph.impromp2.items.Event;
 
-import java.util.logging.Filter;
-
-public class MainActivity extends Activity implements EventSearchFragment.OnFragmentInteractionListener,
+public class MainActivity extends FragmentActivity implements EventSearchFragment.OnFragmentInteractionListener,
         Filterable, Queryable {
-    private DrawerLayout mDrawerLayout;
-    private ActionBarDrawerToggle mDrawerToggle;
-    private ListView mDrawerList;
-
-    private CharSequence mDrawerTitle;
-    private CharSequence mTitle;
-    private String[] mDrawerTitles;
+    private ViewPager mViewPager;
 
     private boolean[] mCheckedFilters;
-
-    private static EventSearchFragment mEventSearchFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_main);
 
-        mTitle = mDrawerTitle = getTitle();
+        final EventFragmentPagerAdapter mEventFragmentAdapter = new EventFragmentPagerAdapter(getSupportFragmentManager());
+        mViewPager = (ViewPager) findViewById(R.id.pager);
+        mViewPager.setAdapter(mEventFragmentAdapter);
 
-        mDrawerTitles = getResources().getStringArray(R.array.drawer_names);
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        mDrawerList = (ListView) findViewById(R.id.left_drawer);
-
-        mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
-        mDrawerList.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, mDrawerTitles));
-        mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
-
-        getActionBar().setDisplayHomeAsUpEnabled(true);
-        getActionBar().setHomeButtonEnabled(true);
-
-        mDrawerToggle = new ActionBarDrawerToggle(
-                this,
-                mDrawerLayout,
-                R.string.drawer_open,
-                R.string.drawer_close
-        ) {
-            public void onDrawerClosed(View view) {
-                super.onDrawerClosed(view);
-                getActionBar().setTitle(mTitle);
-                invalidateOptionsMenu();
-            }
-
-            public void onDrawerOpened(View drawerView) {
-                super.onDrawerOpened(drawerView);
-                getActionBar().setTitle(mDrawerTitle);
-                invalidateOptionsMenu();
-            }
-        };
-
-        mDrawerLayout.setDrawerListener(mDrawerToggle);
-
-        if (savedInstanceState == null) {
-            selectItem(0);
+        if (savedInstanceState == null)
             mCheckedFilters = null;
-        } else
+        else
             mCheckedFilters = savedInstanceState.getBooleanArray(FilterAdapter.CHECKED_FILTERS);
     }
 
@@ -111,6 +63,10 @@ public class MainActivity extends Activity implements EventSearchFragment.OnFrag
         return true;
     }
 
+    public Fragment getCurrentFragment() {
+        return getSupportFragmentManager().findFragmentByTag("android:switcher:" + R.id.pager + ":" + mViewPager.getCurrentItem());
+    }
+
     @Override
     public void startActivity(Intent intent) {
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
@@ -122,15 +78,11 @@ public class MainActivity extends Activity implements EventSearchFragment.OnFrag
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (mDrawerToggle.onOptionsItemSelected(item)) {
-            return true;
-        }
-
         int id = item.getItemId();
 
         if (id == R.id.sort) {
             SortDialogFragment sortDialogFragment = new SortDialogFragment();
-            sortDialogFragment.show(getFragmentManager(), getString(R.string.sort_dialog_title));
+            sortDialogFragment.show(getSupportFragmentManager(), getString(R.string.sort_dialog_title));
             return true;
         } else if (id == R.id.filter) {
             Intent intent = new Intent(this, FilterActivity.class);
@@ -147,7 +99,7 @@ public class MainActivity extends Activity implements EventSearchFragment.OnFrag
         if (requestCode == 0) {
             if (resultCode == RESULT_OK) {
                 mCheckedFilters = data.getBooleanArrayExtra(FilterAdapter.CHECKED_FILTERS);
-                mEventSearchFragment.fetchEvents(null, true, "");
+                ((EventSearchFragment) getCurrentFragment()).fetchEvents(null, true, "");
             }
         }
     }
@@ -155,59 +107,6 @@ public class MainActivity extends Activity implements EventSearchFragment.OnFrag
     @Override
     public boolean[] getFilterOptions() {
         return mCheckedFilters;
-    }
-
-    private class DrawerItemClickListener implements ListView.OnItemClickListener {
-        @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            selectItem(position);
-        }
-    }
-
-    private void selectItem(int position) {
-        FragmentManager fragmentManager = getFragmentManager();
-        Fragment fragment;
-
-        switch (position) {
-            case 0:
-                fragment = new EventSearchFragment();
-                break;
-            case 1:
-                fragment = new EventSearchFragment();
-                break;
-            default:
-                fragment = new EventSearchFragment();
-        }
-
-        fragmentManager.beginTransaction()
-                .replace(R.id.content_frame, fragment)
-                .commit();
-
-        mEventSearchFragment = (EventSearchFragment) fragment;
-
-        mDrawerList.setItemChecked(position, true);
-        setTitle(mDrawerTitles[position]);
-        mDrawerLayout.closeDrawer(mDrawerList);
-    }
-
-    @Override
-    public void setTitle(CharSequence title) {
-        mTitle = title;
-        getActionBar().setTitle(mTitle);
-    }
-
-    @Override
-    protected void onPostCreate(Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-        // Sync the toggle state after onRestoreInstanceState has occurred.
-        mDrawerToggle.syncState();
-    }
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        // Pass any configuration change to the drawer toggles
-        mDrawerToggle.onConfigurationChanged(newConfig);
     }
 
     public void onFragmentInteraction(Event event) {
@@ -218,5 +117,29 @@ public class MainActivity extends Activity implements EventSearchFragment.OnFrag
 
     public String getQuery() {
         return null;
+    }
+
+    public class EventFragmentPagerAdapter extends FragmentPagerAdapter {
+        public EventFragmentPagerAdapter(FragmentManager fm) {
+            super(fm);
+        }
+
+        @Override
+        public Fragment getItem(int i) {
+            return new EventSearchFragment();
+        }
+
+        @Override
+        public int getCount() {
+            return 2;
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            if (position == 0)
+                return "Event Search";
+
+            return "Saved Events";
+        }
     }
 }

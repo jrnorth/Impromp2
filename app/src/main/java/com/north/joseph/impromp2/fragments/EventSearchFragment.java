@@ -1,9 +1,9 @@
 package com.north.joseph.impromp2.fragments;
 
 import android.app.Activity;
-import android.app.ListFragment;
 import android.location.Location;
 import android.os.Bundle;
+import android.support.v4.app.ListFragment;
 import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
