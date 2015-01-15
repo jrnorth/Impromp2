@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/eventdetail_scrollView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
     <RelativeLayout android:layout_width="match_parent" android:layout_height="match_parent">
@@ -30,5 +31,20 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/eventdetail_picture"
             android:layout_alignParentLeft="true"/>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:layout_below="@id/eventdetail_description">
+            <fragment
+                android:id="@+id/map"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:name="com.google.android.gms.maps.MapFragment"/>
+            <ImageView
+                android:id="@+id/transparent_image"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@android:color/transparent" />
+        </RelativeLayout>
     </RelativeLayout>
 </ScrollView>

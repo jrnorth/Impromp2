@@ -5,8 +5,18 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.north.joseph.impromp2.R;
 import com.north.joseph.impromp2.items.Event;
 
@@ -22,7 +32,42 @@ public class EventDetailActivity extends Activity {
         setContentView(R.layout.activity_event_detail);
 
         Intent intent = getIntent();
-        Event event = intent.getParcelableExtra("event");
+        final Event event = intent.getParcelableExtra("event");
+
+        final ScrollView scrollView = (ScrollView) findViewById(R.id.eventdetail_scrollView);
+        final ImageView transparentImageView = (ImageView) findViewById(R.id.transparent_image);
+
+        transparentImageView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                int action = event.getAction();
+                switch (action) {
+                    case MotionEvent.ACTION_DOWN:
+                    case MotionEvent.ACTION_MOVE:
+                        scrollView.requestDisallowInterceptTouchEvent(true);
+                        return false;
+                    case MotionEvent.ACTION_UP:
+                        scrollView.requestDisallowInterceptTouchEvent(false);
+                        return true;
+                    default:
+                        return true;
+                }
+            }
+        });
+
+        ((MapFragment)getFragmentManager().findFragmentById(R.id.map)).getMapAsync(new OnMapReadyCallback() {
+            @Override
+            public void onMapReady(GoogleMap googleMap) {
+                try {
+                    LatLng location = new LatLng(event.getLatitude(), event.getLongitude());
+                    googleMap.setMyLocationEnabled(true);
+                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 14));
+                    googleMap.addMarker(new MarkerOptions().position(location));
+                } catch (JSONException e) {
+                    // Nothing.
+                }
+            }
+        });
 
         TextView eventName = (TextView) findViewById(R.id.eventdetail_title);
         eventName.setText(event.getName());
