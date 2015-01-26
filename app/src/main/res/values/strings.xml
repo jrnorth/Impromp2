@@ -13,5 +13,6 @@
     <string name="title_activity_search_result">SearchResultActivity</string>
     <string name="title_activity_filter">Apply filters</string>
     <string name="filter_title">Filter</string>
+    <string name="favorite_title">Favorite</string>
 
 </resources>

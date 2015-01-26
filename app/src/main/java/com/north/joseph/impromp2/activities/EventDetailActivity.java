@@ -19,6 +19,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.north.joseph.impromp2.R;
 import com.north.joseph.impromp2.items.Event;
+import com.parse.ParseUser;
+import com.parse.ui.ParseLoginBuilder;
 
 import org.json.JSONException;
 
@@ -146,10 +148,14 @@ public class EventDetailActivity extends Activity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        } else if (id == android.R.id.home) {
+        if (id == android.R.id.home) {
             onBackPressed();
+            return true;
+        } else if (id == R.id.favorite) {
+            if (ParseUser.getCurrentUser() == null) {
+                ParseLoginBuilder builder = new ParseLoginBuilder(EventDetailActivity.this);
+                startActivityForResult(builder.build(), 0);
+            }
             return true;
         }
 
