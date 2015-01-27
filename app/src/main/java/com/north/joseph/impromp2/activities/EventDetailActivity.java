@@ -7,6 +7,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.webkit.WebView;
 import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -130,8 +131,8 @@ public class EventDetailActivity extends Activity {
 
         eventDetails.setText(stringBuilder.toString());
 
-        TextView eventDescription = (TextView) findViewById(R.id.eventdetail_description);
-        eventDescription.setText(event.getDescription());
+        WebView eventDescription = (WebView) findViewById(R.id.eventdetail_description);
+        eventDescription.loadData(event.getHTML(), "text/html; charset=UTF-8", null);
     }
 
 

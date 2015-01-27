@@ -29,9 +29,6 @@ public class Event extends ParseObject implements Parcelable {
         String category = in.readString();
         put("category", category);
 
-        String description = in.readString();
-        put("description", description);
-
         String endTime = in.readString();
         put("end_time", endTime);
 
@@ -80,6 +77,9 @@ public class Event extends ParseObject implements Parcelable {
 
         String imageUrl = in.readString();
         put("image_url", imageUrl);
+
+        String html = in.readString();
+        put("html", html);
     }
 
     @Override
@@ -90,7 +90,6 @@ public class Event extends ParseObject implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(getCategory());
-        dest.writeString(getDescription());
         // Write the raw UTC time rather than the formatted time returned by getFormattedEndTime() since we'll
         // want to be able to reuse the getFormattedEndTime() method to get the local time.
         dest.writeString(getEndTime());
@@ -156,6 +155,8 @@ public class Event extends ParseObject implements Parcelable {
         }
 
         dest.writeString(getImageURL());
+
+        dest.writeString(getHTML());
     }
 
     public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
@@ -167,10 +168,6 @@ public class Event extends ParseObject implements Parcelable {
             return new Event[size];
         }
     };
-
-    public String getDescription() {
-        return getString("description");
-    }
 
     public String getFormattedEndTime() throws ParseException {
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
@@ -252,5 +249,9 @@ public class Event extends ParseObject implements Parcelable {
 
     public String getImageURL() {
         return getString("image_url");
+    }
+
+    public String getHTML() {
+        return getString("html");
     }
 }
