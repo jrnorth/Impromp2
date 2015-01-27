@@ -4,36 +4,47 @@ import android.content.Context;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 
 import com.north.joseph.impromp2.R;
 import com.north.joseph.impromp2.items.Event;
 import com.north.joseph.impromp2.views.ViewHolder;
+import com.parse.ParseQuery;
+import com.parse.ParseQueryAdapter;
 
 import org.json.JSONException;
 
 import java.text.ParseException;
-import java.util.List;
 
 /**
  * Created by Joe on 11/23/2014.
  */
-public class EventListAdapter extends ArrayAdapter<Event> {
-    public EventListAdapter(Context c, List<Event> events) {
-        super(c, R.layout.event_view_children, R.id.event_nameTextView, events);
+public class EventListAdapter extends ParseQueryAdapter<Event> {
+    private int mHeight;
+
+    public EventListAdapter(Context context, final EventSearchFragment eventSearchFragment) {
+        super(context, new ParseQueryAdapter.QueryFactory<Event>() {
+            public ParseQuery<Event> create() {
+                return eventSearchFragment.getParseQuery();
+            }
+        });
+
+        setObjectsPerPage(20);
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        View row = super.getView(position, convertView, parent);
-        ViewHolder holder = (ViewHolder) row.getTag();
-
-        if (holder == null) {
-            holder = new ViewHolder(row);
-            row.setTag(holder);
+    public View getItemView(Event event, View convertView, ViewGroup parent) {
+        if (convertView == null) {
+            convertView = View.inflate(getContext(), R.layout.event_view_children, null);
         }
 
-        Event event = getItem(position);
+        super.getItemView(event, convertView, parent);
+
+        ViewHolder holder = (ViewHolder) convertView.getTag();
+
+        if (holder == null) {
+            holder = new ViewHolder(convertView);
+            convertView.setTag(holder);
+        }
 
         final String eventName = event.getName();
 
@@ -55,6 +66,20 @@ public class EventListAdapter extends ArrayAdapter<Event> {
 
         holder.mNameTextView.setText(eventName);
 
-        return row;
+        mHeight = convertView.getHeight() >> 1;
+
+        return convertView;
+    }
+
+    @Override
+    public View getNextPageView(View v, ViewGroup parent) {
+        if (v == null) {
+            v = View.inflate(getContext(), R.layout.get_next_page, null);
+            v.setMinimumHeight(mHeight);
+        }
+
+        super.getNextPageView(v, parent);
+
+        return v;
     }
 }

@@ -14,6 +14,6 @@ public class App extends Application {
     public void onCreate() {
         super.onCreate();
         ParseObject.registerSubclass(Event.class);
-        Parse.initialize(this, getResources().getString(R.string.application_id), getResources().getString(R.string.client_key));
+        Parse.initialize(this, getResources().getString(R.string.parse_app_id), getResources().getString(R.string.parse_client_key));
     }
 }

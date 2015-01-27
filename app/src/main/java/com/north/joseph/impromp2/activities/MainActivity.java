@@ -99,7 +99,7 @@ public class MainActivity extends FragmentActivity implements EventSearchFragmen
         if (requestCode == 0) {
             if (resultCode == RESULT_OK) {
                 mCheckedFilters = data.getBooleanArrayExtra(FilterAdapter.CHECKED_FILTERS);
-                ((EventSearchFragment) getCurrentFragment()).fetchEvents(null, true, "");
+                ((EventSearchFragment) getCurrentFragment()).loadObjects();
             }
         }
     }

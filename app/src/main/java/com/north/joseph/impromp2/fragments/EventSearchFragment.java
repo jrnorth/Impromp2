@@ -15,15 +15,13 @@ import com.google.android.gms.location.LocationServices;
 import com.north.joseph.impromp2.R;
 import com.north.joseph.impromp2.interfaces.Filterable;
 import com.north.joseph.impromp2.interfaces.PersistableChoice;
+import com.north.joseph.impromp2.interfaces.Queryable;
 import com.north.joseph.impromp2.items.Event;
-import com.parse.FindCallback;
-import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseQuery;
+import com.parse.ParseQueryAdapter;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -38,12 +36,6 @@ public class EventSearchFragment extends ListFragment
         implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
         PersistableChoice {
     private EventListAdapter mListAdapter;
-
-    private ParseQuery<Event> query;
-    private List<Event> mEvents = null;
-    private boolean queryInProgress = false;
-
-    private String mQuery = null;
 
     private OnFragmentInteractionListener mListener;
 
@@ -77,6 +69,7 @@ public class EventSearchFragment extends ListFragment
     @Override
     public void onStop() {
         mGoogleApiClient.disconnect();
+        mGoogleApiConnected = false;
         super.onStop();
     }
 
@@ -84,80 +77,78 @@ public class EventSearchFragment extends ListFragment
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        Bundle args = getArguments();
-        if (args != null) {
-            mQuery = args.getString("query");
-        }
-
         mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API)
                 .build();
 
-        fetchEvents(mQuery, false, "");
+        fetchEvents();
     }
 
-    public void fetchEvents(String queryStr, boolean refetch, String sortBy) {
-        Log.d("fetchEvents", "fetching events...");
-        if ((mEvents == null && !queryInProgress) || refetch) {
-            Log.d("onActivityCreated", "saved state not null");
-            queryInProgress = true;
-            setEmptyText("No events");
+    public void loadObjects() {
+        mListAdapter.loadObjects();
+    }
 
-            mListAdapter = new EventListAdapter(getActivity(), new ArrayList<Event>());
-            setListAdapter(mListAdapter);
+    public ParseQuery<Event> getParseQuery() {
+        ParseQuery<Event> query = ParseQuery.getQuery(Event.class);
 
-            setListShown(false);
+        String queryStr = ((Queryable) mListener).getQuery();
 
-            query = ParseQuery.getQuery(Event.class);
-
-            if (queryStr != null) {
-                List<String> queryWords = Arrays.asList(queryStr.split("\\s+"));
-                query.whereContainsAll("searchable_words", queryWords);
-            }
-
-            if ("distance".equals(sortBy)) {
-                if (!mGoogleApiConnected) {
-                    Toast toast = Toast.makeText(getActivity(), "GPS not connected", Toast.LENGTH_SHORT);
-                    toast.show();
-                    setListShown(true);
-                    return;
-                } else {
-                    Location location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-                    query.whereNear("geo_point", new ParseGeoPoint(location.getLatitude(), location.getLongitude()));
-                }
-            } else {
-                query.addAscendingOrder(sortBy);
-            }
-
-            final boolean[] filterOptions = ((Filterable) mListener).getFilterOptions();
-            if (filterOptions != null) {
-                if (filterOptions[0])
-                    query.whereEqualTo("free", Boolean.TRUE);
-
-                LinkedList<String> queryFilters = new LinkedList<>();
-                for (int i = 1; i < filterOptions.length; ++i) {
-                    if (filterOptions[i])
-                        queryFilters.add(FILTER_OPTIONS.get(i - 1));
-                }
-                if (!queryFilters.isEmpty())
-                    query.whereContainedIn("category", queryFilters);
-            }
-
-            query.findInBackground(new FindCallback<Event>() {
-                @Override
-                public void done(List<Event> eventList, ParseException e) {
-                    if (e == null) {
-                        mListAdapter.clear();
-                        mListAdapter.addAll(eventList);
-                        mEvents = eventList;
-                        queryInProgress = false;
-                    }
-                    setListShown(true);
-                }
-            });
+        if (queryStr != null) {
+            List<String> queryWords = Arrays.asList(queryStr.split("\\s+"));
+            query.whereContainsAll("searchable_words", queryWords);
         }
+
+        if (getLastSortingChoice() == 1) { // Distance
+            if (!mGoogleApiConnected) {
+                Toast toast = Toast.makeText(getActivity(), "GPS not connected", Toast.LENGTH_LONG);
+                toast.show();
+            } else {
+                Location location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+                query.whereNear("geo_point", new ParseGeoPoint(location.getLatitude(), location.getLongitude()));
+            }
+        } else if (getLastSortingChoice() == 2) {
+            query.addAscendingOrder("start_time");
+        }
+
+        final boolean[] filterOptions = ((Filterable) mListener).getFilterOptions();
+        if (filterOptions != null) {
+            if (filterOptions[0])
+                query.whereEqualTo("free", Boolean.TRUE);
+
+            LinkedList<String> queryFilters = new LinkedList<>();
+            for (int i = 1; i < filterOptions.length; ++i) {
+                if (filterOptions[i])
+                    queryFilters.add(FILTER_OPTIONS.get(i - 1));
+            }
+            if (!queryFilters.isEmpty())
+                query.whereContainedIn("category", queryFilters);
+        }
+
+        return query;
+    }
+
+    private void fetchEvents() {
+        setEmptyText("No events found.");
+
+        mListAdapter = new EventListAdapter(getActivity(), this);
+
+        mListAdapter.addOnQueryLoadListener(new ParseQueryAdapter.OnQueryLoadListener<Event>() {
+            @Override
+            public void onLoading() {
+                setListShown(false);
+            }
+
+            @Override
+            public void onLoaded(List<Event> events, Exception e) {
+                setListShown(true);
+            }
+        });
+
+        setListAdapter(mListAdapter);
+
+        setListShown(false);
     }
 
     @Override

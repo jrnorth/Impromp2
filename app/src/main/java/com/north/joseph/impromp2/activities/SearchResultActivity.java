@@ -4,7 +4,6 @@ import android.app.SearchManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -32,10 +31,6 @@ public class SearchResultActivity extends FragmentActivity implements EventSearc
             Intent intent = getIntent();
             if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
                 mQuery = intent.getStringExtra(SearchManager.QUERY);
-                Bundle args = new Bundle();
-                args.putString("query", mQuery);
-                Log.d("ACTION_SEARCH", "search");
-                mEventSearchFragment.setArguments(args);
             }
 
             mCheckedFilters = intent.getBooleanArrayExtra(FilterAdapter.CHECKED_FILTERS);
@@ -81,7 +76,7 @@ public class SearchResultActivity extends FragmentActivity implements EventSearc
         if (requestCode == 0) {
             if (resultCode == RESULT_OK) {
                 mCheckedFilters = data.getBooleanArrayExtra(FilterAdapter.CHECKED_FILTERS);
-                mEventSearchFragment.fetchEvents(mQuery, true, "");
+                mEventSearchFragment.loadObjects();
             }
         }
     }
