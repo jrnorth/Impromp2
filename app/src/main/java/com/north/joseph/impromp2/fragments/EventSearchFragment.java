@@ -8,11 +8,9 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationServices;
 import com.north.joseph.impromp2.R;
 import com.north.joseph.impromp2.interfaces.Filterable;
+import com.north.joseph.impromp2.interfaces.Locatable;
 import com.north.joseph.impromp2.interfaces.PersistableChoice;
 import com.north.joseph.impromp2.interfaces.Queryable;
 import com.north.joseph.impromp2.items.Event;
@@ -32,14 +30,10 @@ import java.util.List;
  * interface.
  */
 public class EventSearchFragment extends ListFragment
-        implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
-        PersistableChoice {
+        implements PersistableChoice {
     private EventListAdapter mListAdapter;
 
     private OnFragmentInteractionListener mListener;
-
-    private GoogleApiClient mGoogleApiClient;
-    private static boolean mGoogleApiConnected = false;
 
     private int mLastSortingChoice = 0;
 
@@ -60,27 +54,8 @@ public class EventSearchFragment extends ListFragment
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-        mGoogleApiClient.connect();
-    }
-
-    @Override
-    public void onStop() {
-        mGoogleApiClient.disconnect();
-        mGoogleApiConnected = false;
-        super.onStop();
-    }
-
-    @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
-        mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(LocationServices.API)
-                .build();
 
         fetchEvents();
     }
@@ -100,11 +75,11 @@ public class EventSearchFragment extends ListFragment
         }
 
         if (getLastSortingChoice() == 1) { // Distance
-            if (!mGoogleApiConnected) {
+            Location location = ((Locatable) mListener).getLocation();
+            if (location == null) {
                 Toast toast = Toast.makeText(getActivity(), "GPS not connected", Toast.LENGTH_LONG);
                 toast.show();
             } else {
-                Location location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
                 query.whereNear("geo_point", new ParseGeoPoint(location.getLatitude(), location.getLongitude()));
             }
         } else if (getLastSortingChoice() == 2) {
@@ -177,21 +152,6 @@ public class EventSearchFragment extends ListFragment
         super.onListItemClick(l, v, position, id);
 
         mListener.onFragmentInteraction(mListAdapter.getItem(position));
-    }
-
-    @Override
-    public void onConnected(Bundle bundle) {
-        mGoogleApiConnected = true;
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-        mGoogleApiConnected = false;
-    }
-
-    @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
-        mGoogleApiConnected = false;
     }
 
     /**
