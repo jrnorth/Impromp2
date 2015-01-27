@@ -1,4 +1,4 @@
-package com.north.joseph.impromp2.fragments;
+package com.north.joseph.impromp2.adapters;
 
 import android.content.Context;
 import android.util.Log;
@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.north.joseph.impromp2.R;
+import com.north.joseph.impromp2.fragments.EventSearchFragment;
 import com.north.joseph.impromp2.items.Event;
 import com.north.joseph.impromp2.views.ViewHolder;
 import com.parse.ParseQuery;
