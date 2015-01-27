@@ -9,6 +9,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.north.joseph.impromp2.R;
+import com.north.joseph.impromp2.adapters.EventListAdapter;
 import com.north.joseph.impromp2.interfaces.Filterable;
 import com.north.joseph.impromp2.interfaces.Locatable;
 import com.north.joseph.impromp2.interfaces.PersistableChoice;
