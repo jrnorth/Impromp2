@@ -9,6 +9,7 @@ import com.north.joseph.impromp2.R;
 import com.north.joseph.impromp2.fragments.EventSearchFragment;
 import com.north.joseph.impromp2.items.Event;
 import com.north.joseph.impromp2.views.ViewHolder;
+import com.nostra13.universalimageloader.core.ImageLoader;
 import com.parse.ParseQuery;
 import com.parse.ParseQueryAdapter;
 
@@ -46,6 +47,8 @@ public class EventListAdapter extends ParseQueryAdapter<Event> {
             holder = new ViewHolder(convertView);
             convertView.setTag(holder);
         }
+
+        ImageLoader.getInstance().displayImage(event.getImageURL(), holder.mImageView);
 
         final String eventName = event.getName();
 

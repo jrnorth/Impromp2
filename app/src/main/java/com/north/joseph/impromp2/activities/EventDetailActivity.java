@@ -19,6 +19,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.north.joseph.impromp2.R;
 import com.north.joseph.impromp2.items.Event;
+import com.nostra13.universalimageloader.core.ImageLoader;
 
 import org.json.JSONException;
 
@@ -33,6 +34,9 @@ public class EventDetailActivity extends Activity {
 
         Intent intent = getIntent();
         final Event event = intent.getParcelableExtra("event");
+
+        ImageView image = (ImageView) findViewById(R.id.eventdetail_picture);
+        ImageLoader.getInstance().displayImage(event.getImageURL(), image);
 
         final ScrollView scrollView = (ScrollView) findViewById(R.id.eventdetail_scrollView);
         final ImageView transparentImageView = (ImageView) findViewById(R.id.transparent_image);

@@ -77,6 +77,9 @@ public class Event extends ParseObject implements Parcelable {
         } catch(JSONException ex) {
             // Nothing. This will never throw an exception.
         }
+
+        String imageUrl = in.readString();
+        put("image_url", imageUrl);
     }
 
     @Override
@@ -151,6 +154,8 @@ public class Event extends ParseObject implements Parcelable {
             Log.d("JSONException", ex.getMessage());
             dest.writeString("longitude");
         }
+
+        dest.writeString(getImageURL());
     }
 
     public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
@@ -243,5 +248,9 @@ public class Event extends ParseObject implements Parcelable {
 
     public String getVenueName() throws JSONException {
         return getJSONObject("venue").getString("name");
+    }
+
+    public String getImageURL() {
+        return getString("image_url");
     }
 }
