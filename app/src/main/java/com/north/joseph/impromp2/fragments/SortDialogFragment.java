@@ -68,17 +68,7 @@ public class SortDialogFragment extends DialogFragment {
 
                     mPersistableChoice.setSortingChoice(mSelectedItem);
 
-                    switch (mSelectedItem) {
-                        case 0:
-                            mEventSearchFragment.fetchEvents(mQueryable.getQuery(), true, "");
-                            break;
-                        case 1:
-                            mEventSearchFragment.fetchEvents(mQueryable.getQuery(), true, "distance");
-                            break;
-                        case 2:
-                            mEventSearchFragment.fetchEvents(mQueryable.getQuery(), true, "start_time");
-                            break;
-                    }
+                    mEventSearchFragment.loadObjects();
                 }
             })
             .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {

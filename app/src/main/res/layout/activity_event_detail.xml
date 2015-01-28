@@ -14,9 +14,9 @@
             to handle different screen sizes -->
         <ImageView
             android:id="@+id/eventdetail_picture"
-            android:background="@android:color/darker_gray"
             android:layout_width="150dp"
             android:layout_height="150dp"
+            android:layout_margin="5dp"
             android:layout_alignParentLeft="true"
             android:layout_below="@id/eventdetail_title"/>
         <TextView
@@ -25,7 +25,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/eventdetail_title"
             android:layout_toRightOf="@id/eventdetail_picture"/>
-        <TextView
+        <WebView
             android:id="@+id/eventdetail_description"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
