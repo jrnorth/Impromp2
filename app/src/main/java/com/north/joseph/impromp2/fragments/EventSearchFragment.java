@@ -32,13 +32,13 @@ import java.util.List;
  */
 public class EventSearchFragment extends ListFragment
         implements PersistableChoice {
-    private EventListAdapter mListAdapter;
+    protected EventListAdapter mListAdapter;
 
-    private OnFragmentInteractionListener mListener;
+    protected OnFragmentInteractionListener mListener;
 
-    private int mLastSortingChoice = 0;
+    protected int mLastSortingChoice = 0;
 
-    private static List<String> FILTER_OPTIONS = null;
+    protected static List<String> FILTER_OPTIONS = null;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the

@@ -26,6 +26,9 @@ public class Event extends ParseObject implements Parcelable {
     public Event() {}
 
     public Event(Parcel in) {
+        String objectId = in.readString();
+        setObjectId(objectId);
+
         String category = in.readString();
         put("category", category);
 
@@ -89,6 +92,7 @@ public class Event extends ParseObject implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(getObjectId());
         dest.writeString(getCategory());
         // Write the raw UTC time rather than the formatted time returned by getFormattedEndTime() since we'll
         // want to be able to reuse the getFormattedEndTime() method to get the local time.

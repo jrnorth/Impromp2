@@ -20,6 +20,7 @@ import com.google.android.gms.location.LocationServices;
 import com.north.joseph.impromp2.R;
 import com.north.joseph.impromp2.adapters.FilterAdapter;
 import com.north.joseph.impromp2.fragments.EventSearchFragment;
+import com.north.joseph.impromp2.fragments.SavedEventSearchFragment;
 import com.north.joseph.impromp2.fragments.SortDialogFragment;
 import com.north.joseph.impromp2.interfaces.Filterable;
 import com.north.joseph.impromp2.interfaces.Locatable;
@@ -180,7 +181,10 @@ public class MainActivity extends FragmentActivity implements EventSearchFragmen
 
         @Override
         public Fragment getItem(int i) {
-            return new EventSearchFragment();
+            if (i == 0)
+                return new EventSearchFragment();
+
+            return new SavedEventSearchFragment();
         }
 
         @Override

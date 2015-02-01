@@ -11,6 +11,7 @@ import android.webkit.WebView;
 import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -20,15 +21,22 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.north.joseph.impromp2.R;
 import com.north.joseph.impromp2.items.Event;
-import com.parse.ParseUser;
-import com.parse.ui.ParseLoginBuilder;
 import com.nostra13.universalimageloader.core.ImageLoader;
+import com.parse.CountCallback;
+import com.parse.ParseQuery;
+import com.parse.ParseRelation;
+import com.parse.ParseUser;
+import com.parse.SaveCallback;
+import com.parse.ui.ParseLoginBuilder;
 
 import org.json.JSONException;
 
 import java.text.ParseException;
 
 public class EventDetailActivity extends Activity {
+    private boolean mEventSaved = false;
+    private boolean mDataRetrieved = false;
+    private Event mEvent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,10 +44,19 @@ public class EventDetailActivity extends Activity {
         setContentView(R.layout.activity_event_detail);
 
         Intent intent = getIntent();
-        final Event event = intent.getParcelableExtra("event");
+        mEvent = intent.getParcelableExtra("event");
+
+        if (savedInstanceState == null) {
+            retrieveEventSaved();
+        } else {
+            mEventSaved = savedInstanceState.getBoolean("eventsaved");
+            mDataRetrieved = savedInstanceState.getBoolean("dataretrieved");
+            if (!mDataRetrieved)
+                retrieveEventSaved();
+        }
 
         ImageView image = (ImageView) findViewById(R.id.eventdetail_picture);
-        ImageLoader.getInstance().displayImage(event.getImageURL(), image);
+        ImageLoader.getInstance().displayImage(mEvent.getImageURL(), image);
 
         final ScrollView scrollView = (ScrollView) findViewById(R.id.eventdetail_scrollView);
         final ImageView transparentImageView = (ImageView) findViewById(R.id.transparent_image);
@@ -66,7 +83,7 @@ public class EventDetailActivity extends Activity {
             @Override
             public void onMapReady(GoogleMap googleMap) {
                 try {
-                    LatLng location = new LatLng(event.getLatitude(), event.getLongitude());
+                    LatLng location = new LatLng(mEvent.getLatitude(), mEvent.getLongitude());
                     googleMap.setMyLocationEnabled(true);
                     googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 14));
                     googleMap.addMarker(new MarkerOptions().position(location));
@@ -77,39 +94,39 @@ public class EventDetailActivity extends Activity {
         });
 
         TextView eventName = (TextView) findViewById(R.id.eventdetail_title);
-        eventName.setText(event.getName());
+        eventName.setText(mEvent.getName());
 
         TextView eventDetails = (TextView) findViewById(R.id.eventdetail_details);
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("Start: ");
         try {
-            stringBuilder.append(event.getFormattedStartTime());
+            stringBuilder.append(mEvent.getFormattedStartTime());
         } catch (ParseException ex) {
-            stringBuilder.append(event.getStartTime());
+            stringBuilder.append(mEvent.getStartTime());
         }
         stringBuilder.append("\n");
 
         stringBuilder.append("End: ");
         try {
-            stringBuilder.append(event.getFormattedEndTime());
+            stringBuilder.append(mEvent.getFormattedEndTime());
         } catch (ParseException ex) {
-            stringBuilder.append(event.getEndTime());
+            stringBuilder.append(mEvent.getEndTime());
         }
         stringBuilder.append("\n");
 
         stringBuilder.append("Address: ");
         try {
-            stringBuilder.append(event.getAddress1());
+            stringBuilder.append(mEvent.getAddress1());
         } catch (JSONException ex) {
             stringBuilder.append("address 1");
         }
         stringBuilder.append("\n");
 
         try {
-            if (!event.getAddress2().equals("null")) {
+            if (!mEvent.getAddress2().equals("null")) {
                 stringBuilder.append("         ");
                 try {
-                    stringBuilder.append(event.getAddress2());
+                    stringBuilder.append(mEvent.getAddress2());
                 } catch (JSONException ex) {
                     stringBuilder.append("address 2");
                 }
@@ -121,28 +138,94 @@ public class EventDetailActivity extends Activity {
 
         stringBuilder.append("Venue: ");
         try {
-            stringBuilder.append(event.getVenueName());
+            stringBuilder.append(mEvent.getVenueName());
         } catch (JSONException ex) {
             stringBuilder.append("venue");
         }
         stringBuilder.append("\n");
 
         stringBuilder.append("Free: ");
-        stringBuilder.append(event.isFree() ? "Yes" : "No");
+        stringBuilder.append(mEvent.isFree() ? "Yes" : "No");
         stringBuilder.append("\n");
 
         eventDetails.setText(stringBuilder.toString());
 
         WebView eventDescription = (WebView) findViewById(R.id.eventdetail_description);
-        eventDescription.loadData(event.getHTML(), "text/html; charset=UTF-8", null);
+        eventDescription.loadData(mEvent.getHTML(), "text/html; charset=UTF-8", null);
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putBoolean("eventsaved", mEventSaved);
+        outState.putBoolean("dataretrieved", mDataRetrieved);
+    }
+
+    private void retrieveEventSaved() {
+        if (ParseUser.getCurrentUser() != null) {
+            ParseRelation<Event> eventRelation = ParseUser.getCurrentUser().getRelation("events");
+            ParseQuery<Event> relationQuery = eventRelation.getQuery();
+            relationQuery.whereEqualTo("objectId", mEvent.getObjectId());
+            relationQuery.countInBackground(new CountCallback() {
+                @Override
+                public void done(int i, com.parse.ParseException e) {
+                    mDataRetrieved = true;
+                    if (e == null) {
+                        mEventSaved = i > 0;
+                    }
+                    invalidateOptionsMenu();
+                }
+            });
+        } else {
+            mDataRetrieved = true;
+            invalidateOptionsMenu();
+        }
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+
+        if (!mDataRetrieved) {
+            menu.findItem(R.id.favorite).setEnabled(false);
+        } else {
+            menu.findItem(R.id.favorite).setEnabled(true);
+        }
+
+        if (mEventSaved) {
+            menu.findItem(R.id.favorite).setIcon(R.drawable.ic_action_important);
+        } else {
+            menu.findItem(R.id.favorite).setIcon(R.drawable.ic_action_not_important);
+        }
+
+        return true;
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_event_detail, menu);
         return true;
+    }
+
+    private void saveEvent() {
+        ParseRelation<Event> parseRelation = ParseUser.getCurrentUser().getRelation("events");
+        parseRelation.add(mEvent);
+        mDataRetrieved = false;
+        invalidateOptionsMenu();
+        ParseUser.getCurrentUser().saveInBackground(new SaveCallback() {
+            @Override
+            public void done(com.parse.ParseException e) {
+                if (e == null) {
+                    mEventSaved = true;
+                    Toast toast = Toast.makeText(EventDetailActivity.this, "Event saved!", Toast.LENGTH_SHORT);
+                    toast.show();
+                }
+                mDataRetrieved = true;
+                invalidateOptionsMenu();
+            }
+        });
     }
 
     @Override
@@ -160,10 +243,40 @@ public class EventDetailActivity extends Activity {
             if (ParseUser.getCurrentUser() == null) {
                 ParseLoginBuilder builder = new ParseLoginBuilder(EventDetailActivity.this);
                 startActivityForResult(builder.build(), 0);
+            } else {
+                if (mEventSaved) {
+                    ParseRelation<Event> parseRelation = ParseUser.getCurrentUser().getRelation("events");
+                    parseRelation.remove(mEvent);
+                    mDataRetrieved = false;
+                    invalidateOptionsMenu();
+                    ParseUser.getCurrentUser().saveInBackground(new SaveCallback() {
+                        @Override
+                        public void done(com.parse.ParseException e) {
+                            if (e == null) {
+                                mEventSaved = false;
+                                Toast toast = Toast.makeText(EventDetailActivity.this, "Event removed from saved.", Toast.LENGTH_SHORT);
+                                toast.show();
+                            }
+                            mDataRetrieved = true;
+                            invalidateOptionsMenu();
+                        }
+                    });
+                } else {
+                    saveEvent();
+                }
             }
             return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 0) {
+            if (resultCode == RESULT_OK) {
+                saveEvent();
+            }
+        }
     }
 }
