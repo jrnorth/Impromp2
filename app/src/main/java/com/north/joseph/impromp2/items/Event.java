@@ -38,7 +38,7 @@ public class Event extends ParseObject implements Parcelable {
 
         boolean[] free = new boolean[1];
         in.readBooleanArray(free);
-        put("free", new Boolean(free[0]));
+        put("free", free[0]);
 
         String name = in.readString();
         put("name", name);
