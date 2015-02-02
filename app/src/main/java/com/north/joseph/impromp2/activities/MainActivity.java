@@ -24,6 +24,7 @@ import com.north.joseph.impromp2.fragments.SavedEventSearchFragment;
 import com.north.joseph.impromp2.fragments.SortDialogFragment;
 import com.north.joseph.impromp2.interfaces.Filterable;
 import com.north.joseph.impromp2.interfaces.Locatable;
+import com.north.joseph.impromp2.interfaces.PersistableChoice;
 import com.north.joseph.impromp2.interfaces.Queryable;
 import com.north.joseph.impromp2.items.Event;
 
@@ -103,6 +104,7 @@ public class MainActivity extends FragmentActivity implements EventSearchFragmen
     public void startActivity(Intent intent) {
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             intent.putExtra(FilterAdapter.CHECKED_FILTERS, mCheckedFilters);
+            intent.putExtra(PersistableChoice.SORTING_KEY, ((EventSearchFragment) getCurrentFragment()).getLastSortingChoice());
         }
 
         super.startActivity(intent);

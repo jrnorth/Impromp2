@@ -17,6 +17,7 @@ import com.north.joseph.impromp2.fragments.EventSearchFragment;
 import com.north.joseph.impromp2.fragments.SortDialogFragment;
 import com.north.joseph.impromp2.interfaces.Filterable;
 import com.north.joseph.impromp2.interfaces.Locatable;
+import com.north.joseph.impromp2.interfaces.PersistableChoice;
 import com.north.joseph.impromp2.interfaces.Queryable;
 import com.north.joseph.impromp2.items.Event;
 
@@ -44,6 +45,8 @@ public class SearchResultActivity extends FragmentActivity implements EventSearc
             }
 
             mCheckedFilters = intent.getBooleanArrayExtra(FilterAdapter.CHECKED_FILTERS);
+
+            mEventSearchFragment.setSortingChoice(intent.getIntExtra(PersistableChoice.SORTING_KEY, 0));
 
             getSupportFragmentManager().beginTransaction().add(android.R.id.content, mEventSearchFragment).commit();
         } else {
