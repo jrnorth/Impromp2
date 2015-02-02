@@ -27,6 +27,7 @@ public class SearchResultActivity extends FragmentActivity implements EventSearc
     private static EventSearchFragment mEventSearchFragment;
     private static String mQuery;
     private boolean[] mCheckedFilters;
+    private boolean mSavedEventsChanged = false;
 
     private GoogleApiClient mGoogleApiClient;
     private Location mLocation;
@@ -39,9 +40,7 @@ public class SearchResultActivity extends FragmentActivity implements EventSearc
             mLocation = null;
 
             Intent intent = getIntent();
-            if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-                mQuery = intent.getStringExtra(SearchManager.QUERY);
-            }
+            mQuery = intent.getStringExtra(SearchManager.QUERY);
 
             if (intent.getIntExtra(EventSearchFragment.FRAGMENT_KEY, MainActivity.BROWSE_EVENTS_FRAGMENT) == MainActivity.BROWSE_EVENTS_FRAGMENT)
                 mEventSearchFragment = new EventSearchFragment();
@@ -56,6 +55,7 @@ public class SearchResultActivity extends FragmentActivity implements EventSearc
         } else {
             mCheckedFilters = savedInstanceState.getBooleanArray(FilterAdapter.CHECKED_FILTERS);
             mLocation = savedInstanceState.getParcelable(Locatable.LAST_LOCATION_KEY);
+            mSavedEventsChanged = savedInstanceState.getBoolean("didchange");
         }
 
         setTitle("results for \"" + mQuery + "\"");
@@ -87,6 +87,16 @@ public class SearchResultActivity extends FragmentActivity implements EventSearc
     }
 
     @Override
+    public void onBackPressed() {
+        if (mSavedEventsChanged)
+            setResult(RESULT_OK);
+        else
+            setResult(RESULT_CANCELED);
+
+        super.onBackPressed();
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
@@ -102,6 +112,11 @@ public class SearchResultActivity extends FragmentActivity implements EventSearc
             intent.putExtra(FilterAdapter.CHECKED_FILTERS, mCheckedFilters);
             startActivityForResult(intent, 0);
             return true;
+        } else if (id == android.R.id.home) {
+            if (mSavedEventsChanged)
+                setResult(RESULT_OK);
+            else
+                setResult(RESULT_CANCELED);
         }
 
         return super.onOptionsItemSelected(item);
@@ -114,6 +129,10 @@ public class SearchResultActivity extends FragmentActivity implements EventSearc
                 mCheckedFilters = data.getBooleanArrayExtra(FilterAdapter.CHECKED_FILTERS);
                 mEventSearchFragment.loadObjects();
             }
+        } else if (requestCode == 1) {
+            if (resultCode == RESULT_OK) {
+                mSavedEventsChanged = true;
+            }
         }
     }
 
@@ -123,12 +142,13 @@ public class SearchResultActivity extends FragmentActivity implements EventSearc
 
         outState.putBooleanArray(FilterAdapter.CHECKED_FILTERS, mCheckedFilters);
         outState.putParcelable(Locatable.LAST_LOCATION_KEY, mLocation);
+        outState.putBoolean("didchange", mSavedEventsChanged);
     }
 
     public void onFragmentInteraction(Event event) {
         Intent intent = new Intent(this, EventDetailActivity.class);
         intent.putExtra("event", event);
-        startActivity(intent);
+        startActivityForResult(intent, 1);
     }
 
     public String getQuery() {

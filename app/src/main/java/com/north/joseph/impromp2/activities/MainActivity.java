@@ -104,14 +104,17 @@ public class MainActivity extends FragmentActivity implements EventSearchFragmen
     }
 
     @Override
-    public void startActivity(Intent intent) {
+    public void onNewIntent(Intent intent) {
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-            intent.putExtra(FilterAdapter.CHECKED_FILTERS, mCheckedFilters);
-            intent.putExtra(PersistableChoice.SORTING_KEY, ((EventSearchFragment) getCurrentFragment()).getLastSortingChoice());
-            intent.putExtra(EventSearchFragment.FRAGMENT_KEY, mViewPager.getCurrentItem());
+            final Intent searchIntent = new Intent(this, SearchResultActivity.class);
+            searchIntent.putExtra(SearchManager.QUERY, intent.getStringExtra(SearchManager.QUERY));
+            searchIntent.putExtra(FilterAdapter.CHECKED_FILTERS, mCheckedFilters);
+            searchIntent.putExtra(PersistableChoice.SORTING_KEY, ((EventSearchFragment) getCurrentFragment()).getLastSortingChoice());
+            searchIntent.putExtra(EventSearchFragment.FRAGMENT_KEY, mViewPager.getCurrentItem());
+            startActivityForResult(searchIntent, 2);
+        } else {
+            super.onNewIntent(intent);
         }
-
-        super.startActivity(intent);
     }
 
     @Override
@@ -139,7 +142,7 @@ public class MainActivity extends FragmentActivity implements EventSearchFragmen
                 mCheckedFilters = data.getBooleanArrayExtra(FilterAdapter.CHECKED_FILTERS);
                 ((EventSearchFragment) getCurrentFragment()).loadObjects();
             }
-        } else if (requestCode == 1) {
+        } else if (requestCode == 1 || requestCode == 2) {
             if (resultCode == RESULT_OK) {
                 ((EventSearchFragment) getSupportFragmentManager().findFragmentByTag("android:switcher:" + R.id.pager + ":1")).loadObjects();
             }
