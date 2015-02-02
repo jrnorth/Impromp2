@@ -37,6 +37,7 @@ public class EventDetailActivity extends Activity {
     private boolean mEventSaved = false;
     private boolean mDataRetrieved = false;
     private Event mEvent;
+    private int mTimesFavoritePressed = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +50,7 @@ public class EventDetailActivity extends Activity {
         if (savedInstanceState == null) {
             retrieveEventSaved();
         } else {
+            mTimesFavoritePressed = savedInstanceState.getInt("timespressed");
             mEventSaved = savedInstanceState.getBoolean("eventsaved");
             mDataRetrieved = savedInstanceState.getBoolean("dataretrieved");
             if (!mDataRetrieved)
@@ -160,6 +162,7 @@ public class EventDetailActivity extends Activity {
 
         outState.putBoolean("eventsaved", mEventSaved);
         outState.putBoolean("dataretrieved", mDataRetrieved);
+        outState.putInt("timespressed", mTimesFavoritePressed);
     }
 
     private void retrieveEventSaved() {
@@ -229,6 +232,16 @@ public class EventDetailActivity extends Activity {
     }
 
     @Override
+    public void onBackPressed() {
+        if (mTimesFavoritePressed % 2 == 0)
+            setResult(RESULT_CANCELED);
+        else
+            setResult(RESULT_OK);
+
+        super.onBackPressed();
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
@@ -244,6 +257,7 @@ public class EventDetailActivity extends Activity {
                 ParseLoginBuilder builder = new ParseLoginBuilder(EventDetailActivity.this);
                 startActivityForResult(builder.build(), 0);
             } else {
+                ++mTimesFavoritePressed;
                 if (mEventSaved) {
                     ParseRelation<Event> parseRelation = ParseUser.getCurrentUser().getRelation("events");
                     parseRelation.remove(mEvent);
@@ -275,6 +289,7 @@ public class EventDetailActivity extends Activity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == 0) {
             if (resultCode == RESULT_OK) {
+                ++mTimesFavoritePressed;
                 saveEvent();
             }
         }

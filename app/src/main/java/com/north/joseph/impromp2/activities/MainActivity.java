@@ -133,6 +133,10 @@ public class MainActivity extends FragmentActivity implements EventSearchFragmen
                 mCheckedFilters = data.getBooleanArrayExtra(FilterAdapter.CHECKED_FILTERS);
                 ((EventSearchFragment) getCurrentFragment()).loadObjects();
             }
+        } else if (requestCode == 1) {
+            if (resultCode == RESULT_OK) {
+                ((EventSearchFragment) getSupportFragmentManager().findFragmentByTag("android:switcher:" + R.id.pager + ":1")).loadObjects();
+            }
         }
     }
 
@@ -144,7 +148,7 @@ public class MainActivity extends FragmentActivity implements EventSearchFragmen
     public void onFragmentInteraction(Event event) {
         Intent intent = new Intent(this, EventDetailActivity.class);
         intent.putExtra("event", event);
-        startActivity(intent);
+        startActivityForResult(intent, 1);
     }
 
     public String getQuery() {
