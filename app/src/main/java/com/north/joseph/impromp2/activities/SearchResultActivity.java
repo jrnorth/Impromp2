@@ -14,6 +14,7 @@ import com.google.android.gms.location.LocationServices;
 import com.north.joseph.impromp2.R;
 import com.north.joseph.impromp2.adapters.FilterAdapter;
 import com.north.joseph.impromp2.fragments.EventSearchFragment;
+import com.north.joseph.impromp2.fragments.SavedEventSearchFragment;
 import com.north.joseph.impromp2.fragments.SortDialogFragment;
 import com.north.joseph.impromp2.interfaces.Filterable;
 import com.north.joseph.impromp2.interfaces.Locatable;
@@ -37,12 +38,15 @@ public class SearchResultActivity extends FragmentActivity implements EventSearc
         if (savedInstanceState == null) {
             mLocation = null;
 
-            mEventSearchFragment = new EventSearchFragment();
-
             Intent intent = getIntent();
             if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
                 mQuery = intent.getStringExtra(SearchManager.QUERY);
             }
+
+            if (intent.getIntExtra(EventSearchFragment.FRAGMENT_KEY, MainActivity.BROWSE_EVENTS_FRAGMENT) == MainActivity.BROWSE_EVENTS_FRAGMENT)
+                mEventSearchFragment = new EventSearchFragment();
+            else
+                mEventSearchFragment = new SavedEventSearchFragment();
 
             mCheckedFilters = intent.getBooleanArrayExtra(FilterAdapter.CHECKED_FILTERS);
 

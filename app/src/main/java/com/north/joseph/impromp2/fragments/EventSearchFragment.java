@@ -40,6 +40,8 @@ public class EventSearchFragment extends ListFragment
 
     protected static List<String> FILTER_OPTIONS = null;
 
+    public static final String FRAGMENT_KEY = "fk";
+
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).

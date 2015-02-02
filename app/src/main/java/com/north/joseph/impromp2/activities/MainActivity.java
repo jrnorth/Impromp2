@@ -38,6 +38,9 @@ public class MainActivity extends FragmentActivity implements EventSearchFragmen
     private GoogleApiClient mGoogleApiClient;
     private Location mLocation;
 
+    public static final int BROWSE_EVENTS_FRAGMENT = 0;
+    public static final int SAVED_EVENTS_FRAGMENT = 1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -105,6 +108,7 @@ public class MainActivity extends FragmentActivity implements EventSearchFragmen
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             intent.putExtra(FilterAdapter.CHECKED_FILTERS, mCheckedFilters);
             intent.putExtra(PersistableChoice.SORTING_KEY, ((EventSearchFragment) getCurrentFragment()).getLastSortingChoice());
+            intent.putExtra(EventSearchFragment.FRAGMENT_KEY, mViewPager.getCurrentItem());
         }
 
         super.startActivity(intent);
@@ -187,7 +191,7 @@ public class MainActivity extends FragmentActivity implements EventSearchFragmen
 
         @Override
         public Fragment getItem(int i) {
-            if (i == 0)
+            if (i == BROWSE_EVENTS_FRAGMENT)
                 return new EventSearchFragment();
 
             return new SavedEventSearchFragment();
@@ -200,7 +204,7 @@ public class MainActivity extends FragmentActivity implements EventSearchFragmen
 
         @Override
         public CharSequence getPageTitle(int position) {
-            if (position == 0)
+            if (position == BROWSE_EVENTS_FRAGMENT)
                 return "Event Search";
 
             return "Saved Events";
