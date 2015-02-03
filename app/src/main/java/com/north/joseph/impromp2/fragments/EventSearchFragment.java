@@ -106,7 +106,7 @@ public class EventSearchFragment extends ListFragment
         return query;
     }
 
-    private void fetchEvents() {
+    protected void fetchEvents() {
         setEmptyText("No events found.");
 
         mListAdapter = new EventListAdapter(getActivity(), this);

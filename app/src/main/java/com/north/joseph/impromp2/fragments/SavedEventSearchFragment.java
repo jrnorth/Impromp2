@@ -8,6 +8,7 @@ import android.widget.AbsListView;
 import android.widget.ListView;
 
 import com.north.joseph.impromp2.R;
+import com.north.joseph.impromp2.adapters.EventListAdapter;
 import com.north.joseph.impromp2.items.Event;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
@@ -16,6 +17,7 @@ import com.parse.ParseRelation;
 import com.parse.ParseUser;
 
 import java.util.HashSet;
+import java.util.List;
 
 /**
  * Created by Joe on 1/27/2015.
@@ -114,5 +116,30 @@ public class SavedEventSearchFragment extends EventSearchFragment {
         }
 
         return eventQuery;
+    }
+
+    @Override
+    protected void fetchEvents() {
+        mListAdapter = new EventListAdapter(getActivity(), this);
+
+        mListAdapter.addOnQueryLoadListener(new ParseQueryAdapter.OnQueryLoadListener<Event>() {
+            @Override
+            public void onLoading() {
+                if (ParseUser.getCurrentUser() == null)
+                    setEmptyText("You are not logged in. To save events, you must log in or sign up for an account.");
+                else
+                    setEmptyText("No events found.");
+                setListShown(false);
+            }
+
+            @Override
+            public void onLoaded(List<Event> events, Exception e) {
+                setListShown(true);
+            }
+        });
+
+        setListAdapter(mListAdapter);
+
+        setListShown(false);
     }
 }
