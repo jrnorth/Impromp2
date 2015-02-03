@@ -88,7 +88,9 @@ public class SearchResultActivity extends FragmentActivity implements EventSearc
 
     @Override
     public void onBackPressed() {
-        if (mSavedEventsChanged)
+        final boolean eventsDeletedInSearch = ((mEventSearchFragment instanceof SavedEventSearchFragment) &&
+                ((SavedEventSearchFragment) mEventSearchFragment).wereEventsDeleted());
+        if (mSavedEventsChanged || eventsDeletedInSearch)
             setResult(RESULT_OK);
         else
             setResult(RESULT_CANCELED);
@@ -113,7 +115,9 @@ public class SearchResultActivity extends FragmentActivity implements EventSearc
             startActivityForResult(intent, 0);
             return true;
         } else if (id == android.R.id.home) {
-            if (mSavedEventsChanged)
+            final boolean eventsDeletedInSearch = ((mEventSearchFragment instanceof SavedEventSearchFragment) &&
+                    ((SavedEventSearchFragment) mEventSearchFragment).wereEventsDeleted());
+            if (mSavedEventsChanged || eventsDeletedInSearch)
                 setResult(RESULT_OK);
             else
                 setResult(RESULT_CANCELED);

@@ -21,6 +21,8 @@ import java.util.HashSet;
  * Created by Joe on 1/27/2015.
  */
 public class SavedEventSearchFragment extends EventSearchFragment {
+    private boolean mWereEventsDeleted = false;
+
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
@@ -80,10 +82,16 @@ public class SavedEventSearchFragment extends EventSearchFragment {
 
             @Override
             public void onDestroyActionMode(ActionMode mode) {
-                if (selectedPositions.size() > 0 && deletePressed)
+                if (selectedPositions.size() > 0 && deletePressed) {
+                    mWereEventsDeleted = true;
                     ((ParseQueryAdapter<Event>) getListAdapter()).loadObjects();
+                }
             }
         });
+    }
+
+    public boolean wereEventsDeleted() {
+        return mWereEventsDeleted;
     }
 
     @Override
