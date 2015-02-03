@@ -33,6 +33,8 @@ public class MainActivity extends FragmentActivity implements EventSearchFragmen
         Locatable {
     private ViewPager mViewPager;
 
+    private MenuItem mSearchMenuItem;
+
     private boolean[] mCheckedFilters;
 
     private GoogleApiClient mGoogleApiClient;
@@ -92,7 +94,9 @@ public class MainActivity extends FragmentActivity implements EventSearchFragmen
 
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
 
-        SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
+        mSearchMenuItem = menu.findItem(R.id.search);
+
+        SearchView searchView = (SearchView) mSearchMenuItem.getActionView();
 
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
 
@@ -122,10 +126,12 @@ public class MainActivity extends FragmentActivity implements EventSearchFragmen
         int id = item.getItemId();
 
         if (id == R.id.sort) {
+            mSearchMenuItem.collapseActionView();
             SortDialogFragment sortDialogFragment = new SortDialogFragment();
             sortDialogFragment.show(getSupportFragmentManager(), getString(R.string.sort_dialog_title));
             return true;
         } else if (id == R.id.filter) {
+            mSearchMenuItem.collapseActionView();
             Intent intent = new Intent(this, FilterActivity.class);
             intent.putExtra(FilterAdapter.CHECKED_FILTERS, mCheckedFilters);
             startActivityForResult(intent, 0);
@@ -147,6 +153,8 @@ public class MainActivity extends FragmentActivity implements EventSearchFragmen
                 ((EventSearchFragment) getSupportFragmentManager().findFragmentByTag("android:switcher:" + R.id.pager + ":1")).loadObjects();
             }
         }
+
+        mSearchMenuItem.collapseActionView();
     }
 
     @Override
