@@ -24,6 +24,7 @@ public class App extends Application {
                 .cacheOnDisk(true)
                 .showImageForEmptyUri(R.drawable.ic_launcher)
                 .showImageOnFail(R.drawable.ic_launcher)
+                .showImageOnLoading(android.R.drawable.progress_indeterminate_horizontal)
                 .build();
 
         ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(this)
