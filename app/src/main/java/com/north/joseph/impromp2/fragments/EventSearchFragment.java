@@ -42,6 +42,8 @@ public class EventSearchFragment extends ListFragment
 
     public static final String FRAGMENT_KEY = "fk";
 
+    private static final List<String> STOPWORDS = Arrays.asList("the", "and", "or");
+
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
@@ -73,8 +75,10 @@ public class EventSearchFragment extends ListFragment
         String queryStr = ((Queryable) mListener).getQuery();
 
         if (queryStr != null) {
-            List<String> queryWords = Arrays.asList(queryStr.split("\\s+"));
-            query.whereContainsAll("searchable_words", queryWords);
+            LinkedList<String> queryWords = new LinkedList<>(Arrays.asList(queryStr.toLowerCase().split("\\s+")));
+            queryWords.removeAll(STOPWORDS);
+            if (queryWords.size() > 0)
+                query.whereContainsAll("searchable_words", queryWords);
         }
 
         if (getLastSortingChoice() == 1) { // Distance
