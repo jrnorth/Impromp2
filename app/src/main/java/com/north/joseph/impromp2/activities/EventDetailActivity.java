@@ -62,7 +62,7 @@ public class EventDetailActivity extends Activity {
         }
 
         ImageView image = (ImageView) findViewById(R.id.eventdetail_picture);
-        ImageLoader.getInstance().displayImage(mEvent.getImageURL(), image);
+        ImageLoader.getInstance().displayImage(mEvent.getImageURLOrNull(), image);
 
         final ScrollView scrollView = (ScrollView) findViewById(R.id.eventdetail_scrollView);
         final ImageView transparentImageView = (ImageView) findViewById(R.id.transparent_image);

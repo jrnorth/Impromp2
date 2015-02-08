@@ -48,7 +48,7 @@ public class EventListAdapter extends ParseQueryAdapter<Event> {
             convertView.setTag(holder);
         }
 
-        ImageLoader.getInstance().displayImage(event.getImageURL(), holder.mImageView);
+        ImageLoader.getInstance().displayImage(event.getImageURLOrNull(), holder.mImageView);
 
         final String eventName = event.getName();
 

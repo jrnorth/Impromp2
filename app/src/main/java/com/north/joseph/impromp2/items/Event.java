@@ -250,6 +250,10 @@ public class Event extends ParseObject implements Parcelable {
     }
 
     public String getImageURL() {
+        return getString("image_url");
+    }
+
+    public String getImageURLOrNull() {
         String imageUrl = getString("image_url");
         return imageUrl.equals("None") ? null : imageUrl;
     }
