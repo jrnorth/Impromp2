@@ -1,6 +1,10 @@
 package com.north.joseph.impromp2.activities;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.DialogFragment;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -254,8 +258,8 @@ public class EventDetailActivity extends Activity {
             return true;
         } else if (id == R.id.favorite) {
             if (ParseUser.getCurrentUser() == null) {
-                ParseLoginBuilder builder = new ParseLoginBuilder(EventDetailActivity.this);
-                startActivityForResult(builder.build(), 0);
+                LoginConfirmationFragment loginConfirmationFragment = new LoginConfirmationFragment();
+                loginConfirmationFragment.show(getFragmentManager(), "lcf");
             } else {
                 ++mTimesFavoritePressed;
                 if (mEventSaved) {
@@ -292,6 +296,32 @@ public class EventDetailActivity extends Activity {
                 ++mTimesFavoritePressed;
                 saveEvent();
             }
+        }
+    }
+
+    private void startParseLoginActivity() {
+        ParseLoginBuilder builder = new ParseLoginBuilder(EventDetailActivity.this);
+        startActivityForResult(builder.build(), 0);
+    }
+
+    public static class LoginConfirmationFragment extends DialogFragment {
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            // Use the Builder class for convenient dialog construction
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setMessage("To save events, you need to log in to your account or create an account if you do not have one.")
+                    .setPositiveButton("Continue", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            ((EventDetailActivity) getActivity()).startParseLoginActivity();
+                        }
+                    })
+                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            // User cancelled the dialog
+                        }
+                    });
+            // Create the AlertDialog object and return it
+            return builder.create();
         }
     }
 }

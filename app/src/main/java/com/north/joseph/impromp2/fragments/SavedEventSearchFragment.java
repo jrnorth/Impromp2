@@ -126,7 +126,7 @@ public class SavedEventSearchFragment extends EventSearchFragment {
             @Override
             public void onLoading() {
                 if (ParseUser.getCurrentUser() == null)
-                    setEmptyText("You are not logged in. To save events, you must log in or sign up for an account.");
+                    setEmptyText("You are not logged in. To save events, you must log in or sign up for an account. Tap the star on any event page to get started.");
                 else
                     setEmptyText("No events found.");
                 setListShown(false);
