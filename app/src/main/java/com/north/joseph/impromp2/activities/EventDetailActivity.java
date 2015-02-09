@@ -102,59 +102,54 @@ public class EventDetailActivity extends Activity {
         TextView eventName = (TextView) findViewById(R.id.eventdetail_title);
         eventName.setText(mEvent.getName());
 
-        TextView eventDetails = (TextView) findViewById(R.id.eventdetail_details);
+        TextView eventTime = (TextView) findViewById(R.id.eventdetail_timeTextView);
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("Start: ");
         try {
             stringBuilder.append(mEvent.getFormattedStartTime());
         } catch (ParseException ex) {
             stringBuilder.append(mEvent.getStartTime());
         }
-        stringBuilder.append("\n");
+        stringBuilder.append(" - ");
 
-        stringBuilder.append("End: ");
         try {
             stringBuilder.append(mEvent.getFormattedEndTime());
         } catch (ParseException ex) {
             stringBuilder.append(mEvent.getEndTime());
         }
-        stringBuilder.append("\n");
 
-        stringBuilder.append("Address: ");
+        eventTime.setText(stringBuilder.toString());
+
+        TextView eventLocation = (TextView) findViewById(R.id.eventdetail_locationTextView);
+        stringBuilder.setLength(0);
+
         try {
             stringBuilder.append(mEvent.getAddress1());
         } catch (JSONException ex) {
             stringBuilder.append("address 1");
         }
-        stringBuilder.append("\n");
 
         try {
-            if (!mEvent.getAddress2().equals("null")) {
-                stringBuilder.append("         ");
-                try {
-                    stringBuilder.append(mEvent.getAddress2());
-                } catch (JSONException ex) {
-                    stringBuilder.append("address 2");
-                }
+            String address2 = mEvent.getAddress2();
+            if (address2 != null && !address2.equals("null")) {
                 stringBuilder.append("\n");
+                stringBuilder.append(address2);
             }
         } catch (JSONException ex) {
             // We'll just assume there's no address 2 if this exception is thrown.
         }
 
-        stringBuilder.append("Venue: ");
         try {
+            stringBuilder.append("\n");
             stringBuilder.append(mEvent.getVenueName());
         } catch (JSONException ex) {
             stringBuilder.append("venue");
         }
-        stringBuilder.append("\n");
 
-        stringBuilder.append("Free: ");
-        stringBuilder.append(mEvent.isFree() ? "Yes" : "No");
-        stringBuilder.append("\n");
+        eventLocation.setText(stringBuilder.toString());
 
-        eventDetails.setText(stringBuilder.toString());
+        ((TextView) findViewById(R.id.eventdetail_categoryTextView)).setText(mEvent.getCategory());
+
+        ((TextView) findViewById(R.id.eventdetail_freeTextView)).setText(mEvent.isFree() ? "Free: Yes" : "Free: No");
 
         WebView eventDescription = (WebView) findViewById(R.id.eventdetail_description);
         eventDescription.loadData(mEvent.getHTML(), "text/html; charset=UTF-8", null);

@@ -9,27 +9,52 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
-            android:layout_alignParentLeft="true" />
-        <!-- TODO: replace the image width and height with dimensions in dimens.xml
-            to handle different screen sizes -->
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="5dp"
+            android:textAppearance="@android:style/TextAppearance.Large"
+            android:textStyle="bold"/>
         <ImageView
             android:id="@+id/eventdetail_picture"
-            android:layout_width="150dp"
-            android:layout_height="150dp"
+            android:layout_width="@dimen/event_detail_image_size"
+            android:layout_height="@dimen/event_detail_image_size"
             android:layout_margin="5dp"
             android:layout_alignParentLeft="true"
             android:layout_below="@id/eventdetail_title"/>
         <TextView
-            android:id="@+id/eventdetail_details"
+            android:id="@+id/eventdetail_timeTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/eventdetail_title"
+            android:layout_marginRight="5dp"
+            android:layout_alignTop="@id/eventdetail_picture"
+            android:layout_toRightOf="@id/eventdetail_picture"
+            android:drawableLeft="@drawable/ic_action_time"/>
+        <TextView
+            android:id="@+id/eventdetail_locationTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="5dp"
+            android:layout_below="@id/eventdetail_timeTextView"
+            android:layout_toRightOf="@id/eventdetail_picture"
+            android:drawableLeft="@drawable/ic_action_place"/>
+        <TextView
+            android:id="@+id/eventdetail_categoryTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="5dp"
+            android:layout_below="@id/eventdetail_locationTextView"
+            android:layout_toRightOf="@id/eventdetail_picture"
+            android:drawableLeft="@drawable/ic_action_category"/>
+        <TextView
+            android:id="@+id/eventdetail_freeTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/eventdetail_categoryTextView"
             android:layout_toRightOf="@id/eventdetail_picture"/>
         <WebView
             android:id="@+id/eventdetail_description"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/eventdetail_picture"
+            android:layout_below="@id/eventdetail_freeTextView"
             android:layout_alignParentLeft="true"/>
         <RelativeLayout
             android:layout_width="match_parent"
