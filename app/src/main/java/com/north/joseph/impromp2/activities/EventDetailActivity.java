@@ -123,15 +123,18 @@ public class EventDetailActivity extends Activity {
         stringBuilder.setLength(0);
 
         try {
-            stringBuilder.append(mEvent.getAddress1());
+            final String address1 = mEvent.getAddress1();
+            if (!address1.equals("null"))
+                stringBuilder.append(address1);
         } catch (JSONException ex) {
             stringBuilder.append("address 1");
         }
 
         try {
-            String address2 = mEvent.getAddress2();
-            if (address2 != null && !address2.equals("null")) {
-                stringBuilder.append("\n");
+            final String address2 = mEvent.getAddress2();
+            if (!address2.equals("null")) {
+                if (stringBuilder.length() > 0) // There was an address1, so we need a newline.
+                    stringBuilder.append("\n");
                 stringBuilder.append(address2);
             }
         } catch (JSONException ex) {
@@ -139,8 +142,12 @@ public class EventDetailActivity extends Activity {
         }
 
         try {
-            stringBuilder.append("\n");
-            stringBuilder.append(mEvent.getVenueName());
+            final String venue = mEvent.getVenueName();
+            if (!venue.equals("null")) {
+                if (stringBuilder.length() > 0)// There was an address1 or address2, so we need a newline.
+                   stringBuilder.append("\n");
+                stringBuilder.append(venue);
+            }
         } catch (JSONException ex) {
             stringBuilder.append("venue");
         }
