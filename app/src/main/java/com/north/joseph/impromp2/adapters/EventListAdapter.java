@@ -63,7 +63,20 @@ public class EventListAdapter extends ParseQueryAdapter<Event> {
         try {
             final String venueName = event.getVenueName();
             final String city = event.getCity();
-            holder.mLocationTextView.setText(venueName + ", " + city);
+            if (!venueName.equals("null"))
+                holder.mLocationTextView.setText(venueName + ", " + city);
+            else {
+                final String address1 = event.getAddress1();
+                if (!address1.equals("null"))
+                    holder.mLocationTextView.setText(address1 + ", " + city);
+                else {
+                    final String address2 = event.getAddress2();
+                    if (!address2.equals("null"))
+                        holder.mLocationTextView.setText(address2 + ", " + city);
+                    else
+                        holder.mLocationTextView.setText(city);
+                }
+            }
         } catch (JSONException e) {
             holder.mLocationTextView.setText("Unknown");
         }
