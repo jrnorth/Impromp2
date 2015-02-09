@@ -14,11 +14,13 @@ public class ViewHolder {
     public TextView mNameTextView;
     public TextView mTimeTextView;
     public TextView mLocationTextView;
+    public TextView mCategoryTextView;
 
     public ViewHolder(View row) {
         this.mImageView = (ImageView) row.findViewById(R.id.event_imageView);
         this.mNameTextView = (TextView) row.findViewById(R.id.event_nameTextView);
         this.mTimeTextView = (TextView) row.findViewById(R.id.event_timeTextView);
         this.mLocationTextView = (TextView) row.findViewById(R.id.event_locationTextView);
+        this.mCategoryTextView = (TextView) row.findViewById(R.id.event_categoryTextView);
     }
 }

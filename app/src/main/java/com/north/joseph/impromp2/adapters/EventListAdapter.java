@@ -70,6 +70,8 @@ public class EventListAdapter extends ParseQueryAdapter<Event> {
 
         holder.mNameTextView.setText(eventName);
 
+        holder.mCategoryTextView.setText(event.getCategory());
+
         mHeight = convertView.getHeight() >> 1;
 
         return convertView;
