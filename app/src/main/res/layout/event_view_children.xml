@@ -18,50 +18,32 @@
         android:layout_alignTop="@id/event_imageView"
         android:singleLine="true"
         android:textStyle="bold"/>
-    <ImageView
-        android:id="@+id/event_timeImageView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_action_time"
-        android:layout_toRightOf="@id/event_imageView"
-        android:layout_below="@id/event_nameTextView"/>
     <TextView
         android:id="@+id/event_timeTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/event_timeImageView"
-        android:layout_toLeftOf="@id/event_disclosureImageView"
-        android:layout_alignTop="@id/event_timeImageView"
-        android:singleLine="true"/>
-    <ImageView
-        android:id="@+id/event_locationImageView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_action_place"
         android:layout_toRightOf="@id/event_imageView"
-        android:layout_below="@id/event_timeImageView"/>
+        android:layout_toLeftOf="@id/event_disclosureImageView"
+        android:layout_below="@id/event_nameTextView"
+        android:drawableLeft="@drawable/ic_action_time"
+        android:singleLine="true"/>
     <TextView
         android:id="@+id/event_locationTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/event_locationImageView"
-        android:layout_toLeftOf="@id/event_disclosureImageView"
-        android:layout_alignTop="@id/event_locationImageView"
-        android:singleLine="true"/>
-    <ImageView
-        android:id="@+id/event_categoryImageView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_action_category"
         android:layout_toRightOf="@id/event_imageView"
-        android:layout_below="@id/event_locationImageView"/>
+        android:layout_toLeftOf="@id/event_disclosureImageView"
+        android:layout_below="@id/event_timeTextView"
+        android:drawableLeft="@drawable/ic_action_place"
+        android:singleLine="true"/>
     <TextView
         android:id="@+id/event_categoryTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/event_categoryImageView"
+        android:layout_toRightOf="@id/event_imageView"
         android:layout_toLeftOf="@id/event_disclosureImageView"
-        android:layout_alignTop="@id/event_categoryImageView"
+        android:layout_below="@id/event_locationTextView"
+        android:drawableLeft="@drawable/ic_action_category"
         android:singleLine="true"/>
     <ImageView
         android:id="@id/event_disclosureImageView"
