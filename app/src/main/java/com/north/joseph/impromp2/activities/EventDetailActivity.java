@@ -38,9 +38,9 @@ import org.json.JSONException;
 import java.text.ParseException;
 
 public class EventDetailActivity extends Activity {
-    private boolean mEventSaved = false;
+    private boolean mEventSaved = false, mEventSavedOriginally = false;
     private Event mEvent, mEventObjectReference;
-    private int mTimesFavoritePressed = 0;
+    private boolean mNewLogin = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,8 +54,9 @@ public class EventDetailActivity extends Activity {
         if (savedInstanceState == null) {
             retrieveEventSaved();
         } else {
-            mTimesFavoritePressed = savedInstanceState.getInt("timespressed");
             mEventSaved = savedInstanceState.getBoolean("eventsaved");
+            mEventSavedOriginally = savedInstanceState.getBoolean("eventsavedoriginally");
+            mNewLogin = savedInstanceState.getBoolean("newlogin");
         }
 
         ImageView image = (ImageView) findViewById(R.id.eventdetail_picture);
@@ -164,7 +165,8 @@ public class EventDetailActivity extends Activity {
         super.onSaveInstanceState(outState);
 
         outState.putBoolean("eventsaved", mEventSaved);
-        outState.putInt("timespressed", mTimesFavoritePressed);
+        outState.putBoolean("eventsavedoriginally", mEventSavedOriginally);
+        outState.putBoolean("newlogin", mNewLogin);
     }
 
     private void retrieveEventSaved() {
@@ -179,11 +181,11 @@ public class EventDetailActivity extends Activity {
             try {
                 count = relationQuery.count();
             } catch (com.parse.ParseException e) {
-                mEventSaved = false;
+                mEventSavedOriginally = mEventSaved = false;
             }
 
             if (count > 0)
-                mEventSaved = true;
+                mEventSavedOriginally = mEventSaved = true;
 
             invalidateOptionsMenu();
         }
@@ -226,10 +228,10 @@ public class EventDetailActivity extends Activity {
 
     @Override
     public void onBackPressed() {
-        if (mTimesFavoritePressed % 2 == 0)
-            setResult(RESULT_CANCELED);
-        else
+        if ((mEventSaved != mEventSavedOriginally) || mNewLogin)
             setResult(RESULT_OK);
+        else
+            setResult(RESULT_CANCELED);
 
         super.onBackPressed();
     }
@@ -250,7 +252,6 @@ public class EventDetailActivity extends Activity {
                 LoginConfirmationFragment loginConfirmationFragment = new LoginConfirmationFragment();
                 loginConfirmationFragment.show(getFragmentManager(), "lcf");
             } else {
-                ++mTimesFavoritePressed;
                 if (mEventSaved) {
                     ParseRelation<Event> parseRelation = ParseUser.getCurrentUser().getRelation("events");
                     parseRelation.remove(mEventObjectReference);
@@ -279,8 +280,7 @@ public class EventDetailActivity extends Activity {
         if (requestCode == 0) {
             if (resultCode == RESULT_OK) {
                 ParseUser.getCurrentUser().put(EventListAdapter.USER_SAVED_EVENTS_LOADED, false);
-
-                ++mTimesFavoritePressed;
+                mNewLogin = true;
                 saveEvent();
             }
         }
