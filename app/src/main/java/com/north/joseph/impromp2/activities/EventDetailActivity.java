@@ -38,10 +38,10 @@ import org.json.JSONException;
 import java.text.ParseException;
 
 public class EventDetailActivity extends Activity {
-    private boolean mEventSaved = false;
+    private boolean mEventSaved = false, mEventSavedOriginally = false;
     private boolean mDataRetrieved = false;
     private Event mEvent;
-    private int mTimesFavoritePressed = 0;
+    private boolean mNewLogin = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,9 +54,10 @@ public class EventDetailActivity extends Activity {
         if (savedInstanceState == null) {
             retrieveEventSaved();
         } else {
-            mTimesFavoritePressed = savedInstanceState.getInt("timespressed");
             mEventSaved = savedInstanceState.getBoolean("eventsaved");
+            mEventSavedOriginally = savedInstanceState.getBoolean("eventsavedoriginally");
             mDataRetrieved = savedInstanceState.getBoolean("dataretrieved");
+            mNewLogin = savedInstanceState.getBoolean("newlogin");
             if (!mDataRetrieved)
                 retrieveEventSaved();
         }
@@ -167,8 +168,9 @@ public class EventDetailActivity extends Activity {
         super.onSaveInstanceState(outState);
 
         outState.putBoolean("eventsaved", mEventSaved);
+        outState.putBoolean("eventsavedoriginally", mEventSavedOriginally);
         outState.putBoolean("dataretrieved", mDataRetrieved);
-        outState.putInt("timespressed", mTimesFavoritePressed);
+        outState.putBoolean("newlogin", mNewLogin);
     }
 
     private void retrieveEventSaved() {
@@ -181,7 +183,7 @@ public class EventDetailActivity extends Activity {
                 public void done(int i, com.parse.ParseException e) {
                     mDataRetrieved = true;
                     if (e == null) {
-                        mEventSaved = i > 0;
+                        mEventSavedOriginally = mEventSaved = i > 0;
                     }
                     invalidateOptionsMenu();
                 }
@@ -239,10 +241,10 @@ public class EventDetailActivity extends Activity {
 
     @Override
     public void onBackPressed() {
-        if (mTimesFavoritePressed % 2 == 0)
-            setResult(RESULT_CANCELED);
-        else
+        if ((mEventSaved != mEventSavedOriginally) || mNewLogin)
             setResult(RESULT_OK);
+        else
+            setResult(RESULT_CANCELED);
 
         super.onBackPressed();
     }
@@ -263,7 +265,6 @@ public class EventDetailActivity extends Activity {
                 LoginConfirmationFragment loginConfirmationFragment = new LoginConfirmationFragment();
                 loginConfirmationFragment.show(getFragmentManager(), "lcf");
             } else {
-                ++mTimesFavoritePressed;
                 if (mEventSaved) {
                     ParseRelation<Event> parseRelation = ParseUser.getCurrentUser().getRelation("events");
                     parseRelation.remove(mEvent);
@@ -295,7 +296,7 @@ public class EventDetailActivity extends Activity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == 0) {
             if (resultCode == RESULT_OK) {
-                ++mTimesFavoritePressed;
+                mNewLogin = true;
                 saveEvent();
             }
         }
