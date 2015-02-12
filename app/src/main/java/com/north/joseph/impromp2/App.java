@@ -17,6 +17,7 @@ public class App extends Application {
     public void onCreate() {
         super.onCreate();
         ParseObject.registerSubclass(Event.class);
+        Parse.enableLocalDatastore(this);
         Parse.initialize(this, getResources().getString(R.string.parse_app_id), getResources().getString(R.string.parse_client_key));
 
         DisplayImageOptions options = new DisplayImageOptions.Builder()

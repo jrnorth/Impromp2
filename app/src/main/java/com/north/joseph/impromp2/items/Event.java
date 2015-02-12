@@ -25,7 +25,7 @@ public class Event extends ParseObject implements Parcelable {
 
     public Event(Parcel in) {
         String objectId = in.readString();
-        setObjectId(objectId);
+        put("object_id", objectId);
 
         String category = in.readString();
         put("category", category);

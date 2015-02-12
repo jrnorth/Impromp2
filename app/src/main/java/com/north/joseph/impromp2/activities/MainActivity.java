@@ -13,6 +13,7 @@ import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.SearchView;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -27,6 +28,9 @@ import com.north.joseph.impromp2.interfaces.Locatable;
 import com.north.joseph.impromp2.interfaces.PersistableChoice;
 import com.north.joseph.impromp2.interfaces.Queryable;
 import com.north.joseph.impromp2.items.Event;
+import com.parse.Parse;
+import com.parse.ParseException;
+import com.parse.ParseQuery;
 
 public class MainActivity extends FragmentActivity implements EventSearchFragment.OnFragmentInteractionListener,
         Filterable, Queryable, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
@@ -131,10 +135,19 @@ public class MainActivity extends FragmentActivity implements EventSearchFragmen
             sortDialogFragment.show(getSupportFragmentManager(), getString(R.string.sort_dialog_title));
             return true;
         } else if (id == R.id.filter) {
-            mSearchMenuItem.collapseActionView();
+            /*mSearchMenuItem.collapseActionView();
             Intent intent = new Intent(this, FilterActivity.class);
             intent.putExtra(FilterAdapter.CHECKED_FILTERS, mCheckedFilters);
-            startActivityForResult(intent, 0);
+            startActivityForResult(intent, 0);*/
+            ParseQuery<Event> query = ParseQuery.getQuery(Event.class);
+            query.fromLocalDatastore();
+            try {
+                int count = query.count();
+                Toast toast = Toast.makeText(this, "" + count, Toast.LENGTH_SHORT);
+                toast.show();
+            } catch (ParseException e) {
+
+            }
             return true;
         }
 

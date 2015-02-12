@@ -6,17 +6,21 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.AbsListView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.north.joseph.impromp2.R;
 import com.north.joseph.impromp2.adapters.EventListAdapter;
 import com.north.joseph.impromp2.items.Event;
+import com.parse.DeleteCallback;
 import com.parse.ParseException;
+import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseQueryAdapter;
 import com.parse.ParseRelation;
 import com.parse.ParseUser;
 
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -63,16 +67,17 @@ public class SavedEventSearchFragment extends EventSearchFragment {
                 if (item.getItemId() == R.id.delete) {
                     if (selectedPositions.size() > 0) {
                         ParseRelation<Event> eventRelation = ParseUser.getCurrentUser().getRelation("events");
+                        List<Event> eventsToUnpin = new LinkedList<>();
                         for (int i : selectedPositions) {
-                            Event event = (Event) getListAdapter().getItem(i);
+                            final Event event = (Event) getListAdapter().getItem(i);
                             eventRelation.remove(event);
+                            eventsToUnpin.add(event);
                         }
 
-                        try {
-                            ParseUser.getCurrentUser().save();
-                        } catch (ParseException e) {
-                            // Do nothing.
-                        }
+                        // Unpin the deleted events from the local datastore.
+                        Event.unpinAllInBackground(eventsToUnpin);
+                        // Update the relation on the ParseUser in the local datastore and on the server.
+                        ParseUser.getCurrentUser().saveEventually();
                     }
                     deletePressed = true;
                     mode.finish();
@@ -98,7 +103,7 @@ public class SavedEventSearchFragment extends EventSearchFragment {
 
     @Override
     public ParseQuery<Event> getParseQuery() {
-        ParseUser user = ParseUser.getCurrentUser();
+        final ParseUser user = ParseUser.getCurrentUser();
 
         ParseQuery<Event> eventQuery;
 
@@ -108,6 +113,19 @@ public class SavedEventSearchFragment extends EventSearchFragment {
             ParseRelation<Event> eventRelation = user.getRelation("events");
 
             ParseQuery<Event> relationQuery = eventRelation.getQuery();
+
+            // If the user's saved events have been loaded, query from the local datastore.
+            if (user.getBoolean(EventListAdapter.USER_SAVED_EVENTS_LOADED)) {
+                eventQuery.fromLocalDatastore();
+                relationQuery.fromLocalDatastore();
+            }
+
+            try {
+                Toast toast = Toast.makeText(getActivity(), "" + relationQuery.count(), Toast.LENGTH_SHORT);
+                toast.show();
+            } catch (ParseException e) {
+
+            }
 
             eventQuery.whereMatchesKeyInQuery("objectId", "objectId", relationQuery);
         } else {
@@ -133,7 +151,31 @@ public class SavedEventSearchFragment extends EventSearchFragment {
             }
 
             @Override
-            public void onLoaded(List<Event> events, Exception e) {
+            public void onLoaded(final List<Event> events, Exception e) {
+                final ParseUser parseUser = ParseUser.getCurrentUser();
+                if (parseUser != null && !ParseUser.getCurrentUser().getBoolean(EventListAdapter.USER_SAVED_EVENTS_LOADED) && e == null) {
+                    // This is the first time the user's saved events have been loaded from the server since logging in, so we need to pin them to the background.
+                    Event.unpinAllInBackground(new DeleteCallback() {
+                        @Override
+                        public void done(ParseException e) {
+                            Event.pinAllInBackground(events);
+                        }
+                    });
+
+                    ParseRelation<Event> relation = parseUser.getRelation("events");
+                    // Why do I have to add Events back to the ParseRelation manually?
+                    for (Event ev : events) {
+                        relation.add(ev);
+                    }
+
+                    // Indicate that the user's data has been loaded from the server.
+                    parseUser.put(EventListAdapter.USER_SAVED_EVENTS_LOADED, true);
+                }
+
+                if (e == null)
+                    // Refresh the events, since they probably have been retrieved from the local datastore and the information on the server may have changed.
+                    Event.fetchAllIfNeededInBackground(events);
+
                 setListShown(true);
             }
         });

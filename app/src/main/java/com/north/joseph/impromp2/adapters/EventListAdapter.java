@@ -22,6 +22,7 @@ import java.text.ParseException;
  */
 public class EventListAdapter extends ParseQueryAdapter<Event> {
     private int mHeight;
+    public static final String USER_SAVED_EVENTS_LOADED = "userSavedEventsLoaded";
 
     public EventListAdapter(Context context, final EventSearchFragment eventSearchFragment) {
         super(context, new ParseQueryAdapter.QueryFactory<Event>() {

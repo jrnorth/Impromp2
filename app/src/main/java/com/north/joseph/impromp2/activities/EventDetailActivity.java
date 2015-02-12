@@ -24,9 +24,11 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.north.joseph.impromp2.R;
+import com.north.joseph.impromp2.adapters.EventListAdapter;
 import com.north.joseph.impromp2.items.Event;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.parse.CountCallback;
+import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseRelation;
 import com.parse.ParseUser;
@@ -39,8 +41,7 @@ import java.text.ParseException;
 
 public class EventDetailActivity extends Activity {
     private boolean mEventSaved = false;
-    private boolean mDataRetrieved = false;
-    private Event mEvent;
+    private Event mEvent, mEventObjectReference;
     private int mTimesFavoritePressed = 0;
 
     @Override
@@ -50,15 +51,13 @@ public class EventDetailActivity extends Activity {
 
         Intent intent = getIntent();
         mEvent = intent.getParcelableExtra("event");
+        mEventObjectReference = ParseObject.createWithoutData(Event.class, (String) mEvent.get("object_id"));
 
         if (savedInstanceState == null) {
             retrieveEventSaved();
         } else {
             mTimesFavoritePressed = savedInstanceState.getInt("timespressed");
             mEventSaved = savedInstanceState.getBoolean("eventsaved");
-            mDataRetrieved = savedInstanceState.getBoolean("dataretrieved");
-            if (!mDataRetrieved)
-                retrieveEventSaved();
         }
 
         ImageView image = (ImageView) findViewById(R.id.eventdetail_picture);
@@ -167,7 +166,6 @@ public class EventDetailActivity extends Activity {
         super.onSaveInstanceState(outState);
 
         outState.putBoolean("eventsaved", mEventSaved);
-        outState.putBoolean("dataretrieved", mDataRetrieved);
         outState.putInt("timespressed", mTimesFavoritePressed);
     }
 
@@ -175,19 +173,21 @@ public class EventDetailActivity extends Activity {
         if (ParseUser.getCurrentUser() != null) {
             ParseRelation<Event> eventRelation = ParseUser.getCurrentUser().getRelation("events");
             ParseQuery<Event> relationQuery = eventRelation.getQuery();
-            relationQuery.whereEqualTo("objectId", mEvent.getObjectId());
-            relationQuery.countInBackground(new CountCallback() {
-                @Override
-                public void done(int i, com.parse.ParseException e) {
-                    mDataRetrieved = true;
-                    if (e == null) {
-                        mEventSaved = i > 0;
-                    }
-                    invalidateOptionsMenu();
-                }
-            });
-        } else {
-            mDataRetrieved = true;
+            relationQuery.whereEqualTo("objectId", mEventObjectReference.getObjectId());
+            Toast toast = Toast.makeText(this, mEventObjectReference.getObjectId() == null ? "NULL" : mEventObjectReference.getObjectId(), Toast.LENGTH_LONG);
+            toast.show();
+            relationQuery.fromLocalDatastore();
+
+            int count = 0;
+            try {
+                count = relationQuery.count();
+            } catch (com.parse.ParseException e) {
+                mEventSaved = false;
+            }
+
+            if (count > 0)
+                mEventSaved = true;
+
             invalidateOptionsMenu();
         }
     }
@@ -195,12 +195,6 @@ public class EventDetailActivity extends Activity {
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
-
-        if (!mDataRetrieved) {
-            menu.findItem(R.id.favorite).setEnabled(false);
-        } else {
-            menu.findItem(R.id.favorite).setEnabled(true);
-        }
 
         if (mEventSaved) {
             menu.findItem(R.id.favorite).setIcon(R.drawable.ic_action_important);
@@ -220,21 +214,17 @@ public class EventDetailActivity extends Activity {
 
     private void saveEvent() {
         ParseRelation<Event> parseRelation = ParseUser.getCurrentUser().getRelation("events");
-        parseRelation.add(mEvent);
-        mDataRetrieved = false;
+        parseRelation.add(mEventObjectReference);
+
+        mEventObjectReference.pinInBackground();
+
+        mEventSaved = true;
+        ParseUser.getCurrentUser().saveEventually();
+
+        Toast toast = Toast.makeText(EventDetailActivity.this, "Event saved!", Toast.LENGTH_SHORT);
+        toast.show();
+
         invalidateOptionsMenu();
-        ParseUser.getCurrentUser().saveInBackground(new SaveCallback() {
-            @Override
-            public void done(com.parse.ParseException e) {
-                if (e == null) {
-                    mEventSaved = true;
-                    Toast toast = Toast.makeText(EventDetailActivity.this, "Event saved!", Toast.LENGTH_SHORT);
-                    toast.show();
-                }
-                mDataRetrieved = true;
-                invalidateOptionsMenu();
-            }
-        });
     }
 
     @Override
@@ -266,21 +256,17 @@ public class EventDetailActivity extends Activity {
                 ++mTimesFavoritePressed;
                 if (mEventSaved) {
                     ParseRelation<Event> parseRelation = ParseUser.getCurrentUser().getRelation("events");
-                    parseRelation.remove(mEvent);
-                    mDataRetrieved = false;
+                    parseRelation.remove(mEventObjectReference);
+
+                    mEventObjectReference.unpinInBackground();
+
+                    mEventSaved = false;
+                    ParseUser.getCurrentUser().saveEventually();
+
+                    Toast toast = Toast.makeText(EventDetailActivity.this, "Event removed from saved.", Toast.LENGTH_SHORT);
+                    toast.show();
+
                     invalidateOptionsMenu();
-                    ParseUser.getCurrentUser().saveInBackground(new SaveCallback() {
-                        @Override
-                        public void done(com.parse.ParseException e) {
-                            if (e == null) {
-                                mEventSaved = false;
-                                Toast toast = Toast.makeText(EventDetailActivity.this, "Event removed from saved.", Toast.LENGTH_SHORT);
-                                toast.show();
-                            }
-                            mDataRetrieved = true;
-                            invalidateOptionsMenu();
-                        }
-                    });
                 } else {
                     saveEvent();
                 }
@@ -295,6 +281,8 @@ public class EventDetailActivity extends Activity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == 0) {
             if (resultCode == RESULT_OK) {
+                ParseUser.getCurrentUser().put(EventListAdapter.USER_SAVED_EVENTS_LOADED, false);
+
                 ++mTimesFavoritePressed;
                 saveEvent();
             }
