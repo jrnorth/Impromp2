@@ -6,14 +6,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.AbsListView;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.north.joseph.impromp2.R;
 import com.north.joseph.impromp2.adapters.EventListAdapter;
 import com.north.joseph.impromp2.items.Event;
 import com.parse.DeleteCallback;
 import com.parse.ParseException;
-import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseQueryAdapter;
 import com.parse.ParseRelation;
@@ -118,13 +116,6 @@ public class SavedEventSearchFragment extends EventSearchFragment {
             if (user.getBoolean(EventListAdapter.USER_SAVED_EVENTS_LOADED)) {
                 eventQuery.fromLocalDatastore();
                 relationQuery.fromLocalDatastore();
-            }
-
-            try {
-                Toast toast = Toast.makeText(getActivity(), "" + relationQuery.count(), Toast.LENGTH_SHORT);
-                toast.show();
-            } catch (ParseException e) {
-
             }
 
             eventQuery.whereMatchesKeyInQuery("objectId", "objectId", relationQuery);

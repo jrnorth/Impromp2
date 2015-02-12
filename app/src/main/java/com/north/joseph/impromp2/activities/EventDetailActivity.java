@@ -27,12 +27,10 @@ import com.north.joseph.impromp2.R;
 import com.north.joseph.impromp2.adapters.EventListAdapter;
 import com.north.joseph.impromp2.items.Event;
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.parse.CountCallback;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseRelation;
 import com.parse.ParseUser;
-import com.parse.SaveCallback;
 import com.parse.ui.ParseLoginBuilder;
 
 import org.json.JSONException;
@@ -174,8 +172,7 @@ public class EventDetailActivity extends Activity {
             ParseRelation<Event> eventRelation = ParseUser.getCurrentUser().getRelation("events");
             ParseQuery<Event> relationQuery = eventRelation.getQuery();
             relationQuery.whereEqualTo("objectId", mEventObjectReference.getObjectId());
-            Toast toast = Toast.makeText(this, mEventObjectReference.getObjectId() == null ? "NULL" : mEventObjectReference.getObjectId(), Toast.LENGTH_LONG);
-            toast.show();
+
             relationQuery.fromLocalDatastore();
 
             int count = 0;
