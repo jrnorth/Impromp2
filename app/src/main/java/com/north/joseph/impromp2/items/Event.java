@@ -21,11 +21,13 @@ import java.util.TimeZone;
  */
 @ParseClassName("Event")
 public class Event extends ParseObject implements Parcelable {
+    private static final String OBJECT_ID_FOR_REFERENCE = "oifr";
+
     public Event() {}
 
     public Event(Parcel in) {
         String objectId = in.readString();
-        put("object_id", objectId);
+        put(OBJECT_ID_FOR_REFERENCE, objectId);
 
         String category = in.readString();
         put("category", category);
@@ -260,5 +262,9 @@ public class Event extends ParseObject implements Parcelable {
 
     public String getHTML() {
         return getString("html");
+    }
+
+    public String getObjectIdForObjectReference() {
+        return getString(OBJECT_ID_FOR_REFERENCE);
     }
 }

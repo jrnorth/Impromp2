@@ -51,7 +51,7 @@ public class EventDetailActivity extends Activity {
 
         Intent intent = getIntent();
         mEvent = intent.getParcelableExtra("event");
-        mEventObjectReference = ParseObject.createWithoutData(Event.class, (String) mEvent.get("object_id"));
+        mEventObjectReference = ParseObject.createWithoutData(Event.class, mEvent.getObjectIdForObjectReference());
 
         if (savedInstanceState == null) {
             retrieveEventSaved();
