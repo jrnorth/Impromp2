@@ -22,20 +22,17 @@ import com.north.joseph.impromp2.adapters.FilterAdapter;
 import com.north.joseph.impromp2.fragments.EventSearchFragment;
 import com.north.joseph.impromp2.fragments.SavedEventSearchFragment;
 import com.north.joseph.impromp2.fragments.SortDialogFragment;
-import com.north.joseph.impromp2.interfaces.Filterable;
 import com.north.joseph.impromp2.interfaces.Locatable;
 import com.north.joseph.impromp2.interfaces.PersistableChoice;
 import com.north.joseph.impromp2.interfaces.Queryable;
 import com.north.joseph.impromp2.items.Event;
 
 public class MainActivity extends FragmentActivity implements EventSearchFragment.OnFragmentInteractionListener,
-        Filterable, Queryable, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
+        Queryable, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
         Locatable {
     private ViewPager mViewPager;
 
     private MenuItem mSearchMenuItem;
-
-    private boolean[] mCheckedFilters;
 
     private GoogleApiClient mGoogleApiClient;
     private Location mLocation;
@@ -53,10 +50,8 @@ public class MainActivity extends FragmentActivity implements EventSearchFragmen
         mViewPager.setAdapter(mEventFragmentAdapter);
 
         if (savedInstanceState == null) {
-            mCheckedFilters = null;
             mLocation = null;
         } else {
-            mCheckedFilters = savedInstanceState.getBooleanArray(FilterAdapter.CHECKED_FILTERS);
             mLocation = savedInstanceState.getParcelable(Locatable.LAST_LOCATION_KEY);
         }
 
@@ -83,7 +78,6 @@ public class MainActivity extends FragmentActivity implements EventSearchFragmen
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        outState.putBooleanArray(FilterAdapter.CHECKED_FILTERS, mCheckedFilters);
         outState.putParcelable(Locatable.LAST_LOCATION_KEY, mLocation);
     }
 
@@ -111,9 +105,10 @@ public class MainActivity extends FragmentActivity implements EventSearchFragmen
     public void onNewIntent(Intent intent) {
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             final Intent searchIntent = new Intent(this, SearchResultActivity.class);
+            final EventSearchFragment currentFragment = (EventSearchFragment) getCurrentFragment();
             searchIntent.putExtra(SearchManager.QUERY, intent.getStringExtra(SearchManager.QUERY));
-            searchIntent.putExtra(FilterAdapter.CHECKED_FILTERS, mCheckedFilters);
-            searchIntent.putExtra(PersistableChoice.SORTING_KEY, ((EventSearchFragment) getCurrentFragment()).getLastSortingChoice());
+            searchIntent.putExtra(FilterAdapter.CHECKED_FILTERS, currentFragment.getFilterOptions());
+            searchIntent.putExtra(PersistableChoice.SORTING_KEY, currentFragment.getLastSortingChoice());
             searchIntent.putExtra(EventSearchFragment.FRAGMENT_KEY, mViewPager.getCurrentItem());
             startActivityForResult(searchIntent, 2);
         } else {
@@ -133,7 +128,7 @@ public class MainActivity extends FragmentActivity implements EventSearchFragmen
         } else if (id == R.id.filter) {
             mSearchMenuItem.collapseActionView();
             Intent intent = new Intent(this, FilterActivity.class);
-            intent.putExtra(FilterAdapter.CHECKED_FILTERS, mCheckedFilters);
+            intent.putExtra(FilterAdapter.CHECKED_FILTERS, ((EventSearchFragment) getCurrentFragment()).getFilterOptions());
             startActivityForResult(intent, 0);
             return true;
         }
@@ -145,8 +140,9 @@ public class MainActivity extends FragmentActivity implements EventSearchFragmen
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == 0) {
             if (resultCode == RESULT_OK) {
-                mCheckedFilters = data.getBooleanArrayExtra(FilterAdapter.CHECKED_FILTERS);
-                ((EventSearchFragment) getCurrentFragment()).loadObjects();
+                final EventSearchFragment currentFragment = (EventSearchFragment) getCurrentFragment();
+                currentFragment.setFilterOptions(data.getBooleanArrayExtra(FilterAdapter.CHECKED_FILTERS));
+                currentFragment.loadObjects();
             }
         } else if (requestCode == 1 || requestCode == 2) {
             if (resultCode == RESULT_OK) {
@@ -155,11 +151,6 @@ public class MainActivity extends FragmentActivity implements EventSearchFragmen
         }
 
         mSearchMenuItem.collapseActionView();
-    }
-
-    @Override
-    public boolean[] getFilterOptions() {
-        return mCheckedFilters;
     }
 
     public void onFragmentInteraction(Event event) {

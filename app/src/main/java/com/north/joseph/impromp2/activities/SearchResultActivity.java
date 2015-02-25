@@ -23,10 +23,9 @@ import com.north.joseph.impromp2.interfaces.Queryable;
 import com.north.joseph.impromp2.items.Event;
 
 public class SearchResultActivity extends FragmentActivity implements EventSearchFragment.OnFragmentInteractionListener,
-        Filterable, Queryable, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, Locatable {
+        Queryable, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, Locatable {
     private static EventSearchFragment mEventSearchFragment;
     private static String mQuery;
-    private boolean[] mCheckedFilters;
     private boolean mSavedEventsChanged = false;
 
     private GoogleApiClient mGoogleApiClient;
@@ -47,13 +46,12 @@ public class SearchResultActivity extends FragmentActivity implements EventSearc
             else
                 mEventSearchFragment = new SavedEventSearchFragment();
 
-            mCheckedFilters = intent.getBooleanArrayExtra(FilterAdapter.CHECKED_FILTERS);
+            mEventSearchFragment.setFilterOptions(intent.getBooleanArrayExtra(FilterAdapter.CHECKED_FILTERS));
 
             mEventSearchFragment.setSortingChoice(intent.getIntExtra(PersistableChoice.SORTING_KEY, 0));
 
             getSupportFragmentManager().beginTransaction().add(android.R.id.content, mEventSearchFragment).commit();
         } else {
-            mCheckedFilters = savedInstanceState.getBooleanArray(FilterAdapter.CHECKED_FILTERS);
             mLocation = savedInstanceState.getParcelable(Locatable.LAST_LOCATION_KEY);
             mSavedEventsChanged = savedInstanceState.getBoolean("didchange");
         }
@@ -111,7 +109,7 @@ public class SearchResultActivity extends FragmentActivity implements EventSearc
             return true;
         } else if (id == R.id.filter) {
             Intent intent = new Intent(this, FilterActivity.class);
-            intent.putExtra(FilterAdapter.CHECKED_FILTERS, mCheckedFilters);
+            intent.putExtra(FilterAdapter.CHECKED_FILTERS, mEventSearchFragment.getFilterOptions());
             startActivityForResult(intent, 0);
             return true;
         } else if (id == android.R.id.home) {
@@ -130,7 +128,7 @@ public class SearchResultActivity extends FragmentActivity implements EventSearc
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == 0) {
             if (resultCode == RESULT_OK) {
-                mCheckedFilters = data.getBooleanArrayExtra(FilterAdapter.CHECKED_FILTERS);
+                mEventSearchFragment.setFilterOptions(data.getBooleanArrayExtra(FilterAdapter.CHECKED_FILTERS));
                 mEventSearchFragment.loadObjects();
             }
         } else if (requestCode == 1) {
@@ -144,7 +142,6 @@ public class SearchResultActivity extends FragmentActivity implements EventSearc
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
 
-        outState.putBooleanArray(FilterAdapter.CHECKED_FILTERS, mCheckedFilters);
         outState.putParcelable(Locatable.LAST_LOCATION_KEY, mLocation);
         outState.putBoolean("didchange", mSavedEventsChanged);
     }
@@ -157,11 +154,6 @@ public class SearchResultActivity extends FragmentActivity implements EventSearc
 
     public String getQuery() {
         return mQuery;
-    }
-
-    @Override
-    public boolean[] getFilterOptions() {
-        return mCheckedFilters;
     }
 
     @Override

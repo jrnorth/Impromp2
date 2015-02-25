@@ -31,7 +31,7 @@ import java.util.List;
  * interface.
  */
 public class EventSearchFragment extends ListFragment
-        implements PersistableChoice {
+        implements PersistableChoice, Filterable {
     protected EventListAdapter mListAdapter;
 
     protected OnFragmentInteractionListener mListener;
@@ -43,6 +43,8 @@ public class EventSearchFragment extends ListFragment
     public static final String FRAGMENT_KEY = "fk";
 
     private static final List<String> STOPWORDS = Arrays.asList("the", "and", "or");
+
+    protected boolean[] mCheckedFilters = null;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -93,14 +95,13 @@ public class EventSearchFragment extends ListFragment
             query.addAscendingOrder("start_time");
         }
 
-        final boolean[] filterOptions = ((Filterable) mListener).getFilterOptions();
-        if (filterOptions != null) {
-            if (filterOptions[0])
+        if (mCheckedFilters != null) {
+            if (mCheckedFilters[0])
                 query.whereEqualTo("free", Boolean.TRUE);
 
             LinkedList<String> queryFilters = new LinkedList<>();
-            for (int i = 1; i < filterOptions.length; ++i) {
-                if (filterOptions[i])
+            for (int i = 1; i < mCheckedFilters.length; ++i) {
+                if (mCheckedFilters[i])
                     queryFilters.add(FILTER_OPTIONS.get(i - 1));
             }
             if (!queryFilters.isEmpty())
@@ -182,5 +183,15 @@ public class EventSearchFragment extends ListFragment
 
     public void setSortingChoice(int newChoice) {
         mLastSortingChoice = newChoice;
+    }
+
+    @Override
+    public void setFilterOptions(boolean[] filterOptions) {
+        mCheckedFilters = filterOptions;
+    }
+
+    @Override
+    public boolean[] getFilterOptions() {
+        return mCheckedFilters;
     }
 }
