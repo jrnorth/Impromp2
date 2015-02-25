@@ -6,6 +6,7 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -269,6 +270,10 @@ public class EventDetailActivity extends Activity {
                     saveEvent();
                 }
             }
+            return true;
+        } else if (id == R.id.web_link) {
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(mEvent.getUrl()));
+            startActivity(browserIntent);
             return true;
         }
 

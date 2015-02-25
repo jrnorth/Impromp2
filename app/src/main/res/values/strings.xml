@@ -15,5 +15,6 @@
     <string name="filter_title">Filter</string>
     <string name="favorite_title">Favorite</string>
     <string name="delete_title">Delete</string>
+    <string name="web_link">Web link</string>
 
 </resources>
