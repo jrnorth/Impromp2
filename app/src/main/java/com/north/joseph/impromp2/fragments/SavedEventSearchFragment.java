@@ -103,28 +103,25 @@ public class SavedEventSearchFragment extends EventSearchFragment {
     public ParseQuery<Event> getParseQuery() {
         final ParseUser user = ParseUser.getCurrentUser();
 
-        ParseQuery<Event> eventQuery;
+        ParseQuery<Event> relationQuery;
 
         if (user != null) {
-            eventQuery = super.getParseQuery();
-
             ParseRelation<Event> eventRelation = user.getRelation("events");
 
-            ParseQuery<Event> relationQuery = eventRelation.getQuery();
+            relationQuery = eventRelation.getQuery();
 
             // If the user's saved events have been loaded, query from the local datastore.
             if (user.getBoolean(EventListAdapter.USER_SAVED_EVENTS_LOADED)) {
-                eventQuery.fromLocalDatastore();
                 relationQuery.fromLocalDatastore();
             }
 
-            eventQuery.whereMatchesKeyInQuery("objectId", "objectId", relationQuery);
+            buildParseQuery(relationQuery);
         } else {
-            eventQuery = ParseQuery.getQuery(Event.class);
-            eventQuery.whereEqualTo("objectId", null);
+            relationQuery = ParseQuery.getQuery(Event.class);
+            relationQuery.whereEqualTo("objectId", null);
         }
 
-        return eventQuery;
+        return relationQuery;
     }
 
     @Override

@@ -74,6 +74,12 @@ public class EventSearchFragment extends ListFragment
     public ParseQuery<Event> getParseQuery() {
         ParseQuery<Event> query = ParseQuery.getQuery(Event.class);
 
+        buildParseQuery(query);
+
+        return query;
+    }
+
+    public void buildParseQuery(ParseQuery<Event> query) {
         String queryStr = ((Queryable) mListener).getQuery();
 
         if (queryStr != null) {
@@ -107,8 +113,6 @@ public class EventSearchFragment extends ListFragment
             if (!queryFilters.isEmpty())
                 query.whereContainedIn("category", queryFilters);
         }
-
-        return query;
     }
 
     protected void fetchEvents() {
